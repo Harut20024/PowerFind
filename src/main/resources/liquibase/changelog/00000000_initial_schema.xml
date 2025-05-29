@@ -1,104 +1,150 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
   <changeSet id="1" author="harut.tarzyan">
-    <createTable tableName="molecular_metadata">
-      <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
-        <constraints primaryKey="true" nullable="false"/>
+    <createTable tableName="role">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
       </column>
-      <column name="bg_id" type="varchar(10)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="report_type" type="varchar(20)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="lab_name" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="lab_test_name" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="same_sample_origin" type="varchar(10)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="other_sample_origin" type="varchar(40)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="biopsy_origin_location" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="specimen_and_block_id" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="collection_date" type="date">
-        <constraints nullable="true"/>
-      </column>
-      <column name="data_source" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="scan_issues" type="boolean">
-        <constraints nullable="true"/>
-      </column>
-      <column name="comment" type="text">
-        <constraints nullable="true"/>
-      </column>
+      <column name="role_name" type="VARCHAR(50)"/>
     </createTable>
   </changeSet>
+
   <changeSet id="2" author="harut.tarzyan">
-    <createTable tableName="molecular_data_method_common_parameter">
-      <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
-        <constraints primaryKey="true" nullable="false"/>
+    <createTable tableName="user">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
       </column>
-      <column name="method_name" type="varchar(50)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="method_event" type="varchar(40)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="method_type" type="varchar(60)">
-        <constraints nullable="false"/>
-      </column>
-      <column name="metadata_id" type="UUID">
-        <constraints nullable="false"/>
-      </column>
+      <column name="name" type="VARCHAR(100)"/>
+      <column name="email" type="VARCHAR(100)"/>
+      <column name="phone" type="VARCHAR(20)"/>
+      <column name="registered_on" type="DATE"/>
+      <column name="role_id" type="UUID"/>
     </createTable>
   </changeSet>
+
   <changeSet id="3" author="harut.tarzyan">
-    <createTable tableName="molecular_data_method_extended_parameter">
-      <column name="id" type="UUID" defaultValueComputed="gen_random_uuid()">
-        <constraints primaryKey="true" nullable="false"/>
+    <addForeignKeyConstraint baseTableName="user"
+                             baseColumnNames="role_id"
+                             referencedTableName="role"
+                             referencedColumnNames="id"
+                             onDelete="SET NULL"
+                             constraintName="fk_user_role"/>
+  </changeSet>
+
+  <changeSet id="4" author="harut.tarzyan">
+    <createTable tableName="powerbank">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
       </column>
-      <column name="parameter_name" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="parameter_value" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="value_type" type="varchar(255)">
-        <constraints nullable="true"/>
-      </column>
-      <column name="method_id" type="UUID">
-        <constraints nullable="false"/>
-      </column>
+      <column name="model" type="VARCHAR(100)"/>
+      <column name="capacity_mAh" type="INT"/>
+      <column name="status" type="VARCHAR(20)"/>
+      <column name="charge_cycles" type="INT"/>
+      <column name="last_maintenance" type="DATE"/>
+      <column name="location_id" type="UUID"/>
     </createTable>
   </changeSet>
-  <changeSet id="4" author="harut.tarzyan">
-    <addForeignKeyConstraint baseTableName="molecular_data_method_common_parameter"
-                             baseColumnNames="metadata_id"
-                             referencedTableName="molecular_metadata"
-                             referencedColumnNames="id"
-                             onDelete="CASCADE"
-                             constraintName="fk_molecular_data_method_common_parameter_molecular_metadata"/>
-  </changeSet>
+
   <changeSet id="5" author="harut.tarzyan">
-    <addForeignKeyConstraint baseTableName="molecular_data_method_extended_parameter"
-                             baseColumnNames="method_id"
-                             referencedTableName="molecular_data_method_common_parameter"
+    <createTable tableName="rental_transaction">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="user_id" type="UUID"/>
+      <column name="powerbank_id" type="UUID"/>
+      <column name="start_time" type="TIMESTAMP"/>
+      <column name="end_time" type="TIMESTAMP"/>
+      <column name="payment_id" type="UUID"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="6" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="rental_transaction"
+                             baseColumnNames="user_id"
+                             referencedTableName="user"
                              referencedColumnNames="id"
                              onDelete="CASCADE"
-                             constraintName="fk_molecular_data_method_extended_parameter_molecular_data_method_common_parameter"/>
+                             constraintName="fk_rental_transaction_user"/>
+    <addForeignKeyConstraint baseTableName="rental_transaction"
+                             baseColumnNames="powerbank_id"
+                             referencedTableName="powerbank"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_rental_transaction_powerbank"/>
+    <addForeignKeyConstraint baseTableName="rental_transaction"
+                             baseColumnNames="payment_id"
+                             referencedTableName="payment"
+                             referencedColumnNames="id"
+                             onDelete="SET NULL"
+                             constraintName="fk_rental_transaction_payment"/>
   </changeSet>
+
+  <changeSet id="7" author="harut.tarzyan">
+    <createTable tableName="battery_health">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="powerbank_id" type="UUID"/>
+      <column name="temperature" type="DECIMAL(5,2)"/>
+      <column name="voltage" type="DECIMAL(5,2)"/>
+      <column name="health_status" type="VARCHAR(50)"/>
+      <column name="checked_on" type="TIMESTAMP"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="8" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="battery_health"
+                             baseColumnNames="powerbank_id"
+                             referencedTableName="powerbank"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_battery_health_powerbank"/>
+  </changeSet>
+
+  <changeSet id="9" author="harut.tarzyan">
+    <createTable tableName="maintenance_log">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="powerbank_id" type="UUID"/>
+      <column name="description" type="TEXT"/>
+      <column name="maintenance_date" type="DATE"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="10" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="maintenance_log"
+                             baseColumnNames="powerbank_id"
+                             referencedTableName="powerbank"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_maintenance_log_powerbank"/>
+  </changeSet>
+
+  <changeSet id="11" author="harut.tarzyan">
+    <createTable tableName="payment">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="user_id" type="UUID"/>
+      <column name="amount" type="DECIMAL(10,2)"/>
+      <column name="status" type="VARCHAR(20)"/>
+      <column name="timestamp" type="TIMESTAMP"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="12" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="payment"
+                             baseColumnNames="user_id"
+                             referencedTableName="user"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_payment_user"/>
+  </changeSet>
+
 </databaseChangeLog>
