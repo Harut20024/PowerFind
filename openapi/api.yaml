@@ -1,5 +1,35 @@
 openapi: 3.0.0
 info:
-  title: PowerFind API
-  version: 1.0.0
-paths: {}
+    title: "PowerFind endpointsx"
+    description: >
+      PowerFind endpoints
+    version: snapshot
+paths:
+  /backoffice/location:
+    get:
+      summary: get avaliable locations for powerbanks
+      operationId: getLocation
+      responses:
+        200:
+          description: Changelogs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LocationResponse'
+
+components:
+  schemas:
+    LocationResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/Location'
+
+    Location:
+      type: object
+      properties:
+        streetAddress:
+          type: string
+        city:
+          type: string
+        district:
+          type: string

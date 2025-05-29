@@ -31,6 +31,7 @@ dependencies {
 	// Metrics & Logging
 	implementation 'io.micrometer:micrometer-registry-prometheus:1.12.3'
 	runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
 
 	// Functional helpers
 	implementation 'io.vavr:vavr:0.10.4'

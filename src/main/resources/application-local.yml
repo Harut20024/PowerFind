@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5435/power
+    url: jdbc:postgresql://localhost:5440/powerDB
     username: user
     password: pass
     driver-class-name: org.postgresql.Driver

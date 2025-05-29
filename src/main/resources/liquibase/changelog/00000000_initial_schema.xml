@@ -37,12 +37,43 @@
   </changeSet>
 
   <changeSet id="4" author="harut.tarzyan">
+    <createTable tableName="location_group">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="city" type="VARCHAR(100)"/>
+      <column name="group_name" type="VARCHAR(100)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="5" author="harut.tarzyan">
+    <createTable tableName="location">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="location_group_id" type="UUID"/>
+      <column name="address" type="VARCHAR(255)"/>
+      <column name="latitude" type="DECIMAL(9,6)"/>
+      <column name="longitude" type="DECIMAL(9,6)"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="6" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="location"
+                             baseColumnNames="location_group_id"
+                             referencedTableName="location_group"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_location_group"/>
+  </changeSet>
+
+  <changeSet id="7" author="harut.tarzyan">
     <createTable tableName="powerbank">
       <column name="id" type="UUID">
         <constraints primaryKey="true"/>
       </column>
       <column name="model" type="VARCHAR(100)"/>
-      <column name="capacity_mAh" type="INT"/>
+      <column name="capacity_mah" type="INT"/>
       <column name="status" type="VARCHAR(20)"/>
       <column name="charge_cycles" type="INT"/>
       <column name="last_maintenance" type="DATE"/>
@@ -50,7 +81,37 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="5" author="harut.tarzyan">
+  <changeSet id="8" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="powerbank"
+                             baseColumnNames="location_id"
+                             referencedTableName="location"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_powerbank_location"/>
+  </changeSet>
+
+  <changeSet id="9" author="harut.tarzyan">
+    <createTable tableName="payment">
+      <column name="id" type="UUID">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="user_id" type="UUID"/>
+      <column name="amount" type="DECIMAL(10,2)"/>
+      <column name="status" type="VARCHAR(20)"/>
+      <column name="timestamp" type="TIMESTAMP"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="10" author="harut.tarzyan">
+    <addForeignKeyConstraint baseTableName="payment"
+                             baseColumnNames="user_id"
+                             referencedTableName="user"
+                             referencedColumnNames="id"
+                             onDelete="CASCADE"
+                             constraintName="fk_payment_user"/>
+  </changeSet>
+
+  <changeSet id="11" author="harut.tarzyan">
     <createTable tableName="rental_transaction">
       <column name="id" type="UUID">
         <constraints primaryKey="true"/>
@@ -63,7 +124,7 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="6" author="harut.tarzyan">
+  <changeSet id="12" author="harut.tarzyan">
     <addForeignKeyConstraint baseTableName="rental_transaction"
                              baseColumnNames="user_id"
                              referencedTableName="user"
@@ -84,20 +145,19 @@
                              constraintName="fk_rental_transaction_payment"/>
   </changeSet>
 
-  <changeSet id="7" author="harut.tarzyan">
+  <changeSet id="13" author="harut.tarzyan">
     <createTable tableName="battery_health">
       <column name="id" type="UUID">
         <constraints primaryKey="true"/>
       </column>
       <column name="powerbank_id" type="UUID"/>
-      <column name="temperature" type="DECIMAL(5,2)"/>
       <column name="voltage" type="DECIMAL(5,2)"/>
       <column name="health_status" type="VARCHAR(50)"/>
       <column name="checked_on" type="TIMESTAMP"/>
     </createTable>
   </changeSet>
 
-  <changeSet id="8" author="harut.tarzyan">
+  <changeSet id="14" author="harut.tarzyan">
     <addForeignKeyConstraint baseTableName="battery_health"
                              baseColumnNames="powerbank_id"
                              referencedTableName="powerbank"
@@ -106,7 +166,7 @@
                              constraintName="fk_battery_health_powerbank"/>
   </changeSet>
 
-  <changeSet id="9" author="harut.tarzyan">
+  <changeSet id="15" author="harut.tarzyan">
     <createTable tableName="maintenance_log">
       <column name="id" type="UUID">
         <constraints primaryKey="true"/>
@@ -117,34 +177,13 @@
     </createTable>
   </changeSet>
 
-  <changeSet id="10" author="harut.tarzyan">
+  <changeSet id="16" author="harut.tarzyan">
     <addForeignKeyConstraint baseTableName="maintenance_log"
                              baseColumnNames="powerbank_id"
                              referencedTableName="powerbank"
                              referencedColumnNames="id"
                              onDelete="CASCADE"
                              constraintName="fk_maintenance_log_powerbank"/>
-  </changeSet>
-
-  <changeSet id="11" author="harut.tarzyan">
-    <createTable tableName="payment">
-      <column name="id" type="UUID">
-        <constraints primaryKey="true"/>
-      </column>
-      <column name="user_id" type="UUID"/>
-      <column name="amount" type="DECIMAL(10,2)"/>
-      <column name="status" type="VARCHAR(20)"/>
-      <column name="timestamp" type="TIMESTAMP"/>
-    </createTable>
-  </changeSet>
-
-  <changeSet id="12" author="harut.tarzyan">
-    <addForeignKeyConstraint baseTableName="payment"
-                             baseColumnNames="user_id"
-                             referencedTableName="user"
-                             referencedColumnNames="id"
-                             onDelete="CASCADE"
-                             constraintName="fk_payment_user"/>
   </changeSet>
 
 </databaseChangeLog>
