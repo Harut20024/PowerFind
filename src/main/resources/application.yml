@@ -1,0 +1,11 @@
+spring:
+  main:
+    banner-mode: "off"
+  liquibase:
+    change-log: classpath:/liquibase/master.xml
+management:
+  endpoints:
+    web:
+      base-path: /manage
+      exposure:
+        include: health,prometheus,loggers

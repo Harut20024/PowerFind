@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:14-alpine:///app
+    username: app
+    password: secret
+
+  liquibase:
+    enabled: false

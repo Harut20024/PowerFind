@@ -1,0 +1,96 @@
+plugins {
+	id 'java'
+	id 'idea'
+	id 'org.springframework.boot' version '3.2.3'
+	id 'io.freefair.lombok' version '8.6'
+	id 'org.openapi.generator' version '7.7.0'
+	id 'jacoco'
+}
+
+group = 'com.powerfind'
+version = '1.0.0'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Spring Boot
+	implementation 'org.springframework.boot:spring-boot-starter-web:3.2.3'
+	implementation 'org.springframework.boot:spring-boot-starter-validation:3.2.3'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc:3.2.3'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.2.3'
+
+	// PostgreSQL & Liquibase
+	implementation 'org.postgresql:postgresql:42.7.3'
+	implementation 'org.liquibase:liquibase-core:4.26.0'
+
+	// OpenAPI
+	implementation 'io.swagger.core.v3:swagger-annotations:2.2.22'
+
+	// Metrics & Logging
+	implementation 'io.micrometer:micrometer-registry-prometheus:1.12.3'
+	runtimeOnly 'net.logstash.logback:logstash-logback-encoder:7.4'
+
+	// Functional helpers
+	implementation 'io.vavr:vavr:0.10.4'
+
+	// Testing
+	testImplementation platform('org.junit:junit-bom:5.9.1')
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test:3.2.3'
+	testImplementation 'org.testcontainers:postgresql:1.19.3'
+}
+
+test {
+	useJUnitPlatform()
+}
+
+jacoco {
+	toolVersion = '0.8.11'
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
+}
+
+springBoot {
+	mainClass = 'com.powerfind.Application'
+}
+
+sourceSets {
+	main {
+		java {
+			srcDir "${buildDir}/generated/sources/openapi/src/main/java"
+		}
+	}
+}
+
+tasks.register('generateOpenApi', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
+	group = 'openapi'
+	generatorName = 'spring'
+	inputSpec = "$rootDir/openapi/api.yaml"
+	outputDir = "$buildDir/generated/sources/openapi"
+	apiPackage = 'com.powerfind.api'
+	modelPackage = 'com.powerfind.model'
+	invokerPackage = 'com.powerfind.invoker'
+	configOptions = [
+			library: 'spring-boot',
+			useSpringBoot3: 'true',
+			interfaceOnly: 'true',
+			dateLibrary: 'java8',
+			hideGenerationTimestamp: 'true'
+	]
+	globalProperties = [
+			modelDocs: 'false',
+			apiDocs  : 'false'
+	]
+}
+
+tasks.named('compileJava') {
+	dependsOn 'generateOpenApi'
+}
