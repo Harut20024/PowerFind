@@ -1,24 +1,60 @@
 openapi: 3.0.0
 info:
-    title: "PowerFind endpointsx"
-    description: >
-      PowerFind endpoints
-    version: snapshot
+  title: "PowerFind endpointsx"
+  description: >
+    PowerFind endpoints
+  version: snapshot
 paths:
   /backoffice/location:
     get:
-      summary: get avaliable locations for powerbanks
+      summary: get available locations for powerbanks
       operationId: getLocation
       responses:
         200:
-          description: Changelogs
+          description: Locations
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LocationResponse'
 
+  /backoffice/powerbank:
+    get:
+      summary: get available powerbank for user
+      operationId: getPowerbank
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: powerbankId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - name: requestedDurationMinutes
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Number of minutes the user wants to take the powerbank
+      responses:
+        200:
+          description: powerbank
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditResponse'
+        400:
+          $ref: "#/components/responses/BadRequest"
+
+
 components:
   schemas:
+
     LocationResponse:
       type: array
       items:
@@ -33,3 +69,47 @@ components:
           type: string
         district:
           type: string
+
+    DeleteResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    EditResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+    CreateResponse:
+      type: object
+      required:
+        - message
+        - id
+      properties:
+        message:
+          type: string
+        id:
+          type: string
+          format: uuid
+
+    BadRequestResponse:
+      required:
+        - message
+      properties:
+        message:
+          type: string
+
+
+  responses:
+    BadRequest:
+      description: Bad request (400)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/BadRequestResponse'
