@@ -6,7 +6,8 @@ import java.util.Date;
 import java.util.UUID;
 
 @Data
-public class MaintenanceLog {
+public class MaintenanceLog
+{
     private UUID id;
     private UUID powerbankId;
     private String description;

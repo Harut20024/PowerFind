@@ -6,7 +6,8 @@ import java.security.Timestamp;
 import java.util.UUID;
 
 @Data
-public class RentalTransaction {
+public class RentalTransaction
+{
     private UUID id;
     private UUID userId;
     private UUID powerbankId;

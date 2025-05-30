@@ -21,48 +21,39 @@ import static java.util.function.Predicate.not;
 
 @RestController
 @RequiredArgsConstructor
-public class BackofficeController implements BackofficeApi {
+public class BackofficeController implements BackofficeApi
+{
 
     private final LocationRepository locationRepository;
 
     private final PowerbankSystemService powerbankSystemService;
 
     @Override
-    public ResponseEntity<List<com.powerfind.backoffice.model.Location>> getLocation() {
+    public ResponseEntity<List<com.powerfind.backoffice.model.Location>> getLocation()
+    {
 
-        return Optional.of(locationRepository.getAllWithGroup())
-                .filter(not(List::isEmpty))
-                .map(list -> list.stream()
-                        .map(ModelMapper::map)
-                        .collect(Collectors.toList()))
-                .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.noContent().build());
+        return Optional.of(locationRepository.getAllWithGroup()).filter(not(List::isEmpty)).map(list -> list.stream().map(ModelMapper::map).collect(Collectors.toList())).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @Override
-    public ResponseEntity<EditResponse> postLocation(@Nonnull String city,
-                                                     @Nonnull String district,
-                                                     @Nonnull String address,
-                                                     @Nonnull Double latitude,
-                                                     @Nonnull Double longitude) {
+    public ResponseEntity<EditResponse> postLocation(@Nonnull String city, @Nonnull String district, @Nonnull String address, @Nonnull Double latitude, @Nonnull Double longitude)
+    {
 
 
-        return switch (powerbankSystemService.saveLocation(city, district, address, latitude, longitude)) {
-            case SUCCESS -> ResponseEntity.status(HttpStatus.CREATED)
-                    .body(new EditResponse().message("Location saved successfully"));
-            case ALREADY_EXISTS -> ResponseEntity.status(HttpStatus.CONFLICT)
-                    .body(new EditResponse().message("Location already exists"));
-            case ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new EditResponse().message("Failed to save location due to server error"));
+        return switch (powerbankSystemService.saveLocation(city, district, address, latitude, longitude))
+        {
+            case SUCCESS ->
+                    ResponseEntity.status(HttpStatus.CREATED).body(new EditResponse().message("Location saved successfully"));
+            case ALREADY_EXISTS ->
+                    ResponseEntity.status(HttpStatus.CONFLICT).body(new EditResponse().message("Location already exists"));
+            case ERROR ->
+                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new EditResponse().message("Failed to save location due to server error"));
         };
     }
 
     @Override
-    public ResponseEntity<EditResponse> getPowerbank(
-            @Nonnull UUID userId,
-            @Nonnull Integer requestedDurationMinutes,
-            @Nonnull UUID powerbankId
-    ) {
+    public ResponseEntity<EditResponse> getPowerbank(@Nonnull UUID userId, @Nonnull Integer requestedDurationMinutes, @Nonnull UUID powerbankId)
+    {
         return null;
     }
 }

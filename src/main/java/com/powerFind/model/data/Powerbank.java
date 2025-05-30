@@ -6,7 +6,8 @@ import java.util.Date;
 import java.util.UUID;
 
 @Data
-public class Powerbank {
+public class Powerbank
+{
     private UUID id;
     private String model;
     private int capacityMah;

@@ -5,7 +5,8 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class LocationGroup {
+public class LocationGroup
+{
     private UUID id;
     private String city;
     private String district;

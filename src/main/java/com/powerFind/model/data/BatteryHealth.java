@@ -6,7 +6,8 @@ import java.security.Timestamp;
 import java.util.UUID;
 
 @Data
-public class BatteryHealth {
+public class BatteryHealth
+{
     private UUID id;
     private UUID powerbankId;
     private double voltage;

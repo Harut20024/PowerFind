@@ -22,24 +22,26 @@ import java.util.UUID;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl implements UserRepository
+{
 
     private final NamedParameterJdbcOperations jdbcOperations;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void save(@Nonnull List<User> users) {
+    public void save(@Nonnull List<User> users)
+    {
         jdbcOperations.batchUpdate(
                 """
-                INSERT INTO "user" (id, name, email, phone, registered_on, role_id)
-                VALUES (:id::uuid, :name, :email, :phone, :registered_on, :role_id::uuid)
-                ON CONFLICT (id) DO UPDATE SET
-                    name = :name,
-                    email = :email,
-                    phone = :phone,
-                    registered_on = :registered_on,
-                    role_id = :role_id::uuid
-                """,
+                        INSERT INTO "user" (id, name, email, phone, registered_on, role_id)
+                        VALUES (:id::uuid, :name, :email, :phone, :registered_on, :role_id::uuid)
+                        ON CONFLICT (id) DO UPDATE SET
+                            name = :name,
+                            email = :email,
+                            phone = :phone,
+                            registered_on = :registered_on,
+                            role_id = :role_id::uuid
+                        """,
                 users.stream()
                         .map(user -> new MapSqlParameterSource()
                                 .addValue("id", user.getId().toString())
@@ -54,34 +56,29 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Nonnull
     @Override
-    public Optional<User> get(@Nonnull UUID id) {
-        try {
+    public Optional<User> get(@Nonnull UUID id)
+    {
+        try
+        {
             return Optional.ofNullable(jdbcOperations.queryForObject(
                     """
-                    SELECT id, name, email, phone, registered_on, role_id
-                    FROM "user"
-                    WHERE id = :id::uuid
-                    """,
+                            SELECT id, name, email, phone, registered_on, role_id
+                            FROM "user"
+                            WHERE id = :id::uuid
+                            """,
                     Map.of("id", id.toString()),
                     (rs, rowNum) -> map(rs)
             ));
-        } catch (DataAccessException e) {
+        } catch (DataAccessException e)
+        {
             log.warn("No user found for id: {}. Error: {}", id, e.getMessage());
             return Optional.empty();
         }
     }
 
     @Nonnull
-    @Override
-    public List<User> getAll() {
-        return jdbcOperations.query(
-                "SELECT id, name, email, phone, registered_on, role_id FROM \"user\"",
-                (rs, rowNum) -> map(rs)
-        );
-    }
-
-    @Nonnull
-    private User map(@Nonnull ResultSet resultSet) throws SQLException {
+    private User map(@Nonnull ResultSet resultSet) throws SQLException
+    {
         User user = new User();
         user.setId(UUID.fromString(resultSet.getString("id")));
         user.setName(resultSet.getString("name"));

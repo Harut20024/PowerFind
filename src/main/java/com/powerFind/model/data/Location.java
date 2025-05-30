@@ -5,7 +5,8 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class Location {
+public class Location
+{
     private UUID id;
     private UUID locationGroupId;
     private String address;

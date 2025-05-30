@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface UserRepository {
+public interface UserRepository
+{
 
     void save(@Nonnull List<User> users);
 
     @Nonnull
     Optional<User> get(@Nonnull UUID id);
-
-    @Nonnull
-    List<User> getAll();
 }
