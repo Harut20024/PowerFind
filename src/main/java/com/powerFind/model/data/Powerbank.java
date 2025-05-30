@@ -2,6 +2,7 @@ package com.powerFind.model.data;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.UUID;
 
@@ -15,4 +16,5 @@ public class Powerbank
     private int chargeCycles;
     private Date lastMaintenance;
     private UUID locationId;
+    private BigDecimal pricePerMinute;
 }

@@ -76,6 +76,7 @@
       <column name="capacity_mah" type="INT"/>
       <column name="status" type="VARCHAR(20)"/>
       <column name="charge_cycles" type="INT"/>
+      <column name="price_per_minute" type="DECIMAL(10,2)"/>
       <column name="last_maintenance" type="DATE"/>
       <column name="location_id" type="UUID"/>
     </createTable>

@@ -72,16 +72,15 @@ paths:
             format: uuid
         - name: powerbankId
           in: query
-          required: false
+          required: true
           schema:
             type: string
             format: uuid
         - name: requestedDurationMinutes
           in: query
-          required: true
+          required: false
           schema:
             type: integer
-            minimum: 1
           description: Number of minutes the user wants to take the powerbank
       responses:
         200:
