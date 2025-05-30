@@ -37,7 +37,15 @@ INSERT INTO rental_transaction (id, user_id, powerbank_id, start_time, end_time,
 
 INSERT INTO battery_health (id, powerbank_id, voltage, health_status, checked_on) VALUES
                                                                                       ('e5f6a7b8-9c0d-1e2f-3a4b-c5d6e7f8a9b0', '9a07e5a1-2b0c-40d6-e8c8-d6a2c2f9b900', 3.70, 'Good', '2024-05-01 08:00:00'),
-                                                                                      ('f6a7b8c9-0d1e-2f3a-4b5c-d6e7f8a9b0c1', '1c29a7c3-4d2e-52f8-e0e0-f8c4e4b8d112', 3.60, 'Fair', '2024-03-10 09:30:00');
+                                                                                      ('f6a7b8c9-0d1e-2f3a-4b5c-d6e7f8a9b0c1', '1c29a7c3-4d2e-52f8-e0e0-f8c4e4b8d112', 3.60, 'Fair', '2024-03-10 09:30:00'),
+                                                                                      ('aa1b2c3d-4e5f-6a7b-8c9d-0e1f2a3b4c5d', '0b18f6b2-3c1d-41e7-f9d9-e7b3d3a7c001', 3.75, 'Good', '2024-04-25 10:00:00'),
+                                                                                      ('bb2c3d4e-5f6a-7b8c-9d0e-1f2a3b4c5d6e', '2d30b8d4-5e3f-63a9-a1f1-a9d5f5c9e223', 3.65, 'Good', '2024-05-16 11:15:00'),
+                                                                                      ('cc3d4e5f-6a7b-8c9d-0e1f-2a3b4c5d6e7f', '3e41a9e5-6f4a-74b0-a2c2-b0e6b6d0f334', 3.55, 'Fair', '2024-02-20 09:45:00'),
+                                                                                      ('dd4e5f6a-7b8c-9d0e-1f2a-3b4c5d6e7f8a', '4f52a0f6-7a5b-85b1-a3b3-a1f7a7e1a445', 3.80, 'Good', '2024-03-20 14:30:00'),
+                                                                                      ('ee5f6a7b-8c9d-0e1f-2a3b-4c5d6e7f8a9b', '5a63c1b7-8b6c-96a2-b4c4-b2a8a8f2b556', 3.70, 'Good', '2024-04-10 16:20:00'),
+                                                                                      ('ff6a7b8c-9d0e-1f2a-3b4c-5d6e7f8a9b0c', '6a74c2a8-9b7c-a7a3-c5b5-c3a9a9b3a667', 3.65, 'Good', '2024-02-18 12:10:00'),
+                                                                                      ('a07b8c9d-0e1f-2a3b-4c5d-6e7f8a9b0c1d', '7a85b3a9-0a8c-b8b4-c6c6-c4a0a0a4b778', 3.50, 'Needs Maintenance', '2024-01-31 13:40:00'),
+                                                                                      ('b18c9d0e-1f2a-3b4c-5d6e-7f8a9b0c1d2e', '8a96b4a0-1a9b-c9c5-d7d7-c5a1a1b5a889', 3.85, 'Excellent', '2024-05-13 15:25:00');
 
 INSERT INTO maintenance_log (id, powerbank_id, description, maintenance_date) VALUES
                                                                                   ('a7b8c9d0-1e2f-3a4b-5c6d-e7f8a9b0c1d2', '3e41a9e5-6f4a-74b0-a2c2-b0e6b6d0f334', 'Replaced worn cable', '2024-01-22'),

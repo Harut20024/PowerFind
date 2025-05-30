@@ -74,11 +74,11 @@ sourceSets {
 tasks.register('generateOpenApi', org.openapitools.generator.gradle.plugin.tasks.GenerateTask) {
 	group = 'openapi'
 	generatorName = 'spring'
-	inputSpec = "$rootDir/openapi/api.yaml"
+	inputSpec = "$rootDir/openapi/backoffice-api.yaml"
 	outputDir = "$buildDir/generated/sources/openapi"
-	apiPackage = 'com.powerfind.api'
-	modelPackage = 'com.powerfind.model'
-	invokerPackage = 'com.powerfind.invoker'
+	apiPackage = 'com.powerfind.backoffice.api'
+	modelPackage = 'com.powerfind.backoffice.model'
+	invokerPackage = 'com.powerfind.backoffice.invoker'
 	configOptions = [
 			library: 'spring-boot',
 			useSpringBoot3: 'true',

@@ -4,6 +4,8 @@ info:
   description: >
     PowerFind endpoints
   version: snapshot
+
+
 paths:
   /backoffice/location:
     get:
@@ -11,11 +13,51 @@ paths:
       operationId: getLocation
       responses:
         200:
-          description: Locations
+          description: get Locations
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/LocationResponse'
+    post:
+      summary: add new location for powerbank
+      operationId: postLocation
+      parameters:
+        - name: city
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: district
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: address
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: latitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+        - name: longitude
+          in: query
+          required: true
+          schema:
+            type: number
+            format: double
+      responses:
+        200:
+          description: create new location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditResponse'
+        400:
+          $ref: "#/components/responses/BadRequest"
 
   /backoffice/powerbank:
     get:
@@ -43,7 +85,51 @@ paths:
           description: Number of minutes the user wants to take the powerbank
       responses:
         200:
-          description: powerbank
+          description: get powerbank
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EditResponse'
+        400:
+          $ref: "#/components/responses/BadRequest"
+
+    post:
+      description: add new powerbank
+      operationId: postPowerbank
+      parameters:
+        - name: model
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: voltage
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: health
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: capacity
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: location
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: district
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: add new powerbank
           content:
             application/json:
               schema:
@@ -54,7 +140,6 @@ paths:
 
 components:
   schemas:
-
     LocationResponse:
       type: array
       items:
