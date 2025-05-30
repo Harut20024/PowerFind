@@ -6,7 +6,7 @@ INSERT INTO "user" (id, name, email, phone, registered_on, role_id) VALUES
                                                                         ('2a30e8d4-5f3c-43c9-a01e-69e5d5f92223', 'Harut', 'harut@example.com', '+37412345678', '2024-01-15', '0e18c6b2-3f1a-41a7-8f9c-47c3b3d7e001'),
                                                                         ('3b41f9e5-6a4d-74d0-b2f0-70f6e6f03334', 'Andre', 'andre@example.com', '+37498765432', '2024-02-10', 'd3f2b1c9-8e74-4f59-84ad-3c4db04a1ae6');
 
-INSERT INTO location_group (id, city, group_name) VALUES
+INSERT INTO location_group (id, city, district) VALUES
                                                       ('4c52f0f6-7b5e-45e1-92b3-81f7f7f1a445', 'Gyumri', 'Gyumri Center'),
                                                       ('5d63a1f7-8c6f-56f2-a4c4-92f8f8f2b556', 'Gyumri', 'Gyumri Industrial Park');
 

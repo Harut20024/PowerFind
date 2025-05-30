@@ -42,7 +42,7 @@
         <constraints primaryKey="true"/>
       </column>
       <column name="city" type="VARCHAR(100)"/>
-      <column name="group_name" type="VARCHAR(100)"/>
+      <column name="district" type="VARCHAR(100)"/>
     </createTable>
   </changeSet>
 
