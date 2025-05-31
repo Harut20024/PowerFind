@@ -61,30 +61,17 @@ paths:
 
   /public/powerbank:
     get:
-      summary: get available powerbank for user
+      summary: Get available powerbank for user (with JSON body)
       operationId: getPowerbank
-      parameters:
-        - name: userId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: powerbankId
-          in: query
-          required: true
-          schema:
-            type: string
-            format: uuid
-        - name: requestedDurationMinutes
-          in: query
-          required: false
-          schema:
-            type: integer
-          description: Number of minutes the user wants to take the powerbank
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PowerbankRequest'
       responses:
         200:
-          description: get powerbank
+          description: Get powerbank
           content:
             application/json:
               schema:
@@ -189,6 +176,20 @@ components:
         message:
           type: string
 
+    PowerbankRequest:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        powerbankId:
+          type: string
+          format: uuid
+        requestedDurationMinutes:
+          type: integer
+      required:
+        - userId
+        - powerbankId
 
   responses:
     BadRequest:

@@ -83,53 +83,60 @@ public class PowerbankSystemService
                         .collect(Collectors.toList()));
     }
 
+    @Nonnull
     public Optional<Powerbank> getPowerbank(
             @Nonnull UUID userId,
             @Nullable Integer requestedDurationMinutes,
             @Nonnull UUID powerbankId
     )
     {
-        return Optional.of(
-                        queryService.existsUserAndPowerbank(userId, powerbankId))
-                .filter(Boolean::booleanValue)
-                .flatMap(ignored -> powerbankRepository.get(powerbankId))
-                .map(powerbank -> {
+        try
+        {
+            return Optional.of(queryService.existsUserAndPowerbank(userId, powerbankId))
+                    .filter(Boolean::booleanValue)
+                    .flatMap(ignored -> powerbankRepository.get(powerbankId))
+                    .map(powerbank -> {
+                        BigDecimal totalAmount = (requestedDurationMinutes != null && powerbank.getPricePerMinute() != null)
+                                ? powerbank.getPricePerMinute()
+                                .multiply(BigDecimal.valueOf(requestedDurationMinutes))
+                                : null;
 
-                    BigDecimal totalAmount = (requestedDurationMinutes != null && powerbank.getPricePerMinute() != null)
-                            ? powerbank.getPricePerMinute().multiply(
-                            BigDecimal.valueOf(requestedDurationMinutes))
-                            : null;
+                        UUID paymentId = UUID.randomUUID();
+                        Instant now = Instant.now();
 
+                        paymentRepository.save(new Payment(
+                                paymentId,
+                                userId,
+                                totalAmount,
+                                "pending",
+                                Timestamp.from(now)
+                        ));
 
-                    UUID paymentId = UUID.randomUUID();
-                    Instant now = Instant.now();
+                        Timestamp endTime = (requestedDurationMinutes != null)
+                                ? Timestamp.from(
+                                now.plus(requestedDurationMinutes, ChronoUnit.MINUTES))
+                                : null;
 
-                    paymentRepository.save(new Payment(
-                            paymentId,
-                            userId,
-                            totalAmount,
-                            "pending",
-                            Timestamp.from(now)
-                    ));
+                        rentalTransactionRepository.save(List.of(new RentalTransaction(
+                                UUID.randomUUID(),
+                                userId,
+                                powerbankId,
+                                Timestamp.from(now),
+                                endTime,
+                                paymentId
+                        )));
 
-                    Timestamp endTime = requestedDurationMinutes != null
-                            ? Timestamp.from(now.plus(requestedDurationMinutes,
-                            ChronoUnit.MINUTES))
-                            : null;
+                        powerbankRepository.updateStatus(powerbankId);
 
-                    rentalTransactionRepository.save(
-                            List.of(new RentalTransaction(
-                                    UUID.randomUUID(),
-                                    userId,
-                                    powerbankId,
-                                    Timestamp.from(now),
-                                    endTime,
-                                    paymentId
-                            )));
-
-                    return powerbank;
-                });
+                        return powerbank;
+                    });
+        } catch (Exception e)
+        {
+            log.error("Database error during getPowerbank: {}", e.getMessage(), e);
+            return Optional.empty();
+        }
     }
+
 }
 
 

@@ -13,7 +13,10 @@ public final class ModelMapper
 {
 
     @Nonnull
-    public LocationGroup map(UUID id, String city, String district)
+    public LocationGroup map(
+            UUID id,
+            String city,
+            String district)
     {
         LocationGroup group = new LocationGroup();
         group.setId(id);
@@ -23,7 +26,8 @@ public final class ModelMapper
     }
 
     @Nonnull
-    public Location map(UUID id, UUID groupId, String address, Double latitude, Double longitude)
+    public Location map(UUID id, UUID groupId, String address, Double latitude,
+                        Double longitude)
     {
         Location location = new Location();
         location.setId(id);

@@ -3,8 +3,8 @@ package com.powerFind.controller.backoffice;
 import com.powerFind.service.PowerbankSystemService;
 import com.powerfind.backoffice.api.PublicApi;
 import com.powerfind.backoffice.model.EditResponse;
+import com.powerfind.backoffice.model.PowerbankRequest;
 import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 
 @RestController
@@ -48,22 +47,19 @@ public class BackofficeController implements PublicApi
             case ALREADY_EXISTS -> ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(new EditResponse().message(
                             "Location already exists"));
-            case ERROR ->
-                    ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                            .body(new EditResponse().message(
-                                    "Failed to save location due to server error"));
+            case ERROR -> ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new EditResponse().message(
+                            "Failed to save location due to server error"));
         };
     }
 
     @Override
     public ResponseEntity<EditResponse> getPowerbank(
-            @Nonnull UUID userId,
-            @Nonnull UUID powerbankId,
-            @Nullable Integer requestedDurationMinutes
-    )
+            @Nonnull PowerbankRequest getPowerbankRequest)
     {
-        return powerbankSystemService.getPowerbank(userId,
-                        requestedDurationMinutes, powerbankId)
+        return powerbankSystemService.getPowerbank(getPowerbankRequest.getUserId(),
+                        getPowerbankRequest.getRequestedDurationMinutes(),
+                        getPowerbankRequest.getPowerbankId())
                 .map(powerbank -> ResponseEntity.ok(
                         new EditResponse().message(
                                 "Powerbank retrieved successfully")))

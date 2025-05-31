@@ -23,8 +23,7 @@ public class QueryService
     public boolean exists(@Nonnull String city, @Nonnull String district,
                           @Nonnull String address)
     {
-        return Boolean.TRUE.equals(jdbcOperations.queryForObject(
-                """
+        return Boolean.TRUE.equals(jdbcOperations.queryForObject("""
                         SELECT EXISTS (
                             SELECT 1
                             FROM location_group lg
@@ -32,26 +31,32 @@ public class QueryService
                             WHERE lg.city = :city AND lg.district = :district AND l.address = :address
                         )
                         """,
-                Map.of(
-                        "city", city,
-                        "district", district,
-                        "address", address
-                ),
-                Boolean.class
-        ));
+                Map.of("city", city, "district", district, "address", address),
+                Boolean.class));
     }
 
     @Nonnull
     public List<Location> getAllWithGroup()
     {
-        return jdbcOperations.query(
-                """
-                            SELECT l.id, l.address, l.latitude, l.longitude, l.location_group_id,
-                                   lg.city, lg.district
-                            FROM location l
-                            JOIN location_group lg ON l.location_group_id = lg.id
+        return jdbcOperations.query("""
+                    SELECT l.id, l.address, l.latitude, l.longitude, l.location_group_id,
+                           lg.city, lg.district
+                    FROM location l
+                    JOIN location_group lg ON l.location_group_id = lg.id
+                """, (rs, rowNum) -> mapWithGroup(rs));
+    }
+
+
+    boolean existsUserAndPowerbank(UUID userId, UUID powerbankId)
+    {
+        return Boolean.TRUE.equals(jdbcOperations.queryForObject("""
+                        SELECT
+                            EXISTS (SELECT 1 FROM "user" WHERE id = :userId)
+                            AND
+                            EXISTS (SELECT 1 FROM powerbank WHERE id = :powerbankId)
                         """,
-                (rs, rowNum) -> mapWithGroup(rs));
+                Map.of("userId", userId, "powerbankId", powerbankId),
+                Boolean.class));
     }
 
     @Nonnull
@@ -72,23 +77,4 @@ public class QueryService
 
         return location;
     }
-
-    boolean existsUserAndPowerbank(UUID userId, UUID powerbankId)
-    {
-        return Boolean.TRUE.equals(jdbcOperations.queryForObject(
-                """
-                        SELECT
-                            EXISTS (SELECT 1 FROM "user" WHERE id = :userId)
-                            AND
-                            EXISTS (SELECT 1 FROM powerbank WHERE id = :powerbankId)
-                        """,
-                Map.of(
-                        "userId", userId,
-                        "powerbankId", powerbankId
-                ),
-                Boolean.class
-        ));
-
-    }
-
 }
