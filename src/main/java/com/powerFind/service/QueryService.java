@@ -2,6 +2,7 @@ package com.powerFind.service;
 
 
 import com.powerFind.model.data.Location;
+import com.powerFind.model.data.LocationAggregate;
 import com.powerFind.model.data.LocationGroup;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
@@ -36,14 +37,14 @@ public class QueryService
     }
 
     @Nonnull
-    public List<Location> getAllWithGroup()
+    public List<LocationAggregate> getAllWithGroup()
     {
         return jdbcOperations.query("""
                     SELECT l.id, l.address, l.latitude, l.longitude, l.location_group_id,
                            lg.city, lg.district
                     FROM location l
                     JOIN location_group lg ON l.location_group_id = lg.id
-                """, (rs, rowNum) -> mapWithGroup(rs));
+                """, (rs, rowNum) -> map(rs));
     }
 
 
@@ -60,21 +61,22 @@ public class QueryService
     }
 
     @Nonnull
-    private Location mapWithGroup(ResultSet resultSet) throws SQLException
+    private LocationAggregate map(@Nonnull ResultSet resultSet) throws SQLException
     {
-        LocationGroup group = new LocationGroup();
-        group.setId(UUID.fromString(resultSet.getString("location_group_id")));
-        group.setCity(resultSet.getString("city"));
-        group.setDistrict(resultSet.getString("district"));
-
-        Location location = new Location();
-        location.setId(UUID.fromString(resultSet.getString("id")));
-        location.setLocationGroupId(group.getId());
-        location.setAddress(resultSet.getString("address"));
-        location.setLatitude(resultSet.getDouble("latitude"));
-        location.setLongitude(resultSet.getDouble("longitude"));
-        location.setLocationGroup(group);
-
-        return location;
+        return new LocationAggregate(
+                new Location(
+                        UUID.fromString(resultSet.getString("id")),
+                        UUID.fromString(resultSet.getString("location_group_id")),
+                        resultSet.getString("address"),
+                        resultSet.getDouble("latitude"),
+                        resultSet.getDouble("longitude")
+                ),
+                new LocationGroup(
+                        UUID.fromString(resultSet.getString("location_group_id")),
+                        resultSet.getString("city"),
+                        resultSet.getString("district")
+                )
+        );
     }
+
 }

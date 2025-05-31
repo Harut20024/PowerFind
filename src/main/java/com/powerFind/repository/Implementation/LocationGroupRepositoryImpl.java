@@ -19,7 +19,8 @@ public class LocationGroupRepositoryImpl implements LocationGroupRepository {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveLocationGroup(@Nonnull LocationGroup locationGroup) {
+    public void save(@Nonnull LocationGroup locationGroup)
+    {
         jdbcOperations.update(
                 """
                         INSERT INTO location_group (id, city, district)

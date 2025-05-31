@@ -1,6 +1,7 @@
 package com.powerFind.repository.Implementation;
 
 import com.powerFind.model.data.Payment;
+import com.powerFind.model.domain.PaymentEnum;
 import com.powerFind.repository.PaymentRepository;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class PaymentRepositoryImpl implements PaymentRepository
         params.put("id", payment.getId().toString());
         params.put("userId", payment.getUserId().toString());
         params.put("amount", payment.getAmount());
-        params.put("status", payment.getStatus());
+        params.put("status", payment.getStatus().name());
         params.put("timestamp", payment.getTimestamp());
 
         jdbcOperations.update(sql, params);
@@ -77,7 +78,7 @@ public class PaymentRepositoryImpl implements PaymentRepository
         payment.setId(UUID.fromString(rs.getString("id")));
         payment.setUserId(UUID.fromString(rs.getString("user_id")));
         payment.setAmount(rs.getBigDecimal("amount"));
-        payment.setStatus(rs.getString("status"));
+        payment.setStatus(PaymentEnum.fromString(rs.getString("status"), PaymentEnum.PENDING));
         payment.setTimestamp(rs.getTimestamp("timestamp"));
         return payment;
     }

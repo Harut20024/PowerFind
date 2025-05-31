@@ -1,10 +1,12 @@
 package com.powerFind.controller.backoffice;
 
+import com.powerFind.repository.ModelMapper;
 import com.powerFind.service.PowerbankSystemService;
 import com.powerfind.backoffice.api.PublicApi;
 import com.powerfind.backoffice.model.EditResponse;
-import com.powerfind.backoffice.model.PowerbankRequest;
+import com.powerfind.backoffice.model.NewPowerbankRequest;
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 
 @RestController
@@ -30,11 +33,12 @@ public class BackofficeController implements PublicApi
     }
 
     @Override
-    public ResponseEntity<EditResponse> postLocation(@Nonnull String city,
-                                                     @Nonnull String district,
-                                                     @Nonnull String address,
-                                                     @Nonnull Double latitude,
-                                                     @Nonnull Double longitude)
+    public ResponseEntity<EditResponse> postLocation(
+            @Nonnull String city,
+            @Nonnull String district,
+            @Nonnull String address,
+            @Nonnull Double latitude,
+            @Nonnull Double longitude)
     {
 
 
@@ -55,17 +59,29 @@ public class BackofficeController implements PublicApi
 
     @Override
     public ResponseEntity<EditResponse> getPowerbank(
-            @Nonnull PowerbankRequest getPowerbankRequest)
+            @Nonnull UUID userId,
+            @Nonnull UUID powerbankId,
+            @Nullable Integer requestedDurationMinutes
+    )
     {
-        return powerbankSystemService.getPowerbank(getPowerbankRequest.getUserId(),
-                        getPowerbankRequest.getRequestedDurationMinutes(),
-                        getPowerbankRequest.getPowerbankId())
+        return powerbankSystemService.getPowerbank(userId, requestedDurationMinutes, powerbankId)
                 .map(powerbank -> ResponseEntity.ok(
-                        new EditResponse().message(
-                                "Powerbank retrieved successfully")))
+                        new EditResponse().message("Powerbank retrieved successfully")))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(new EditResponse().message(
-                                "Powerbank not found")));
+                        .body(new EditResponse().message("Powerbank not found")));
     }
+
+    @Override
+    public ResponseEntity<EditResponse> postPowerbank(
+            @Nonnull NewPowerbankRequest newPowerbankRequest)
+    {
+        return powerbankSystemService.savePowerbank(
+                        ModelMapper.map(newPowerbankRequest))
+                .map(exist -> ResponseEntity.ok(
+                        new EditResponse().message("Powerbank added successfully")))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(new EditResponse().message("Powerbank not added")));
+    }
+
 
 }

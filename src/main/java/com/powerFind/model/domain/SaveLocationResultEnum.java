@@ -1,6 +1,6 @@
 package com.powerFind.model.domain;
 
-public enum SaveLocationResult
+public enum SaveLocationResultEnum
 {
     SUCCESS,
     ALREADY_EXISTS,

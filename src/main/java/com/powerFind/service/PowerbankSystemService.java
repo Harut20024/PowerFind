@@ -1,12 +1,10 @@
 package com.powerFind.service;
 
-import com.powerFind.model.data.Payment;
-import com.powerFind.model.data.Powerbank;
-import com.powerFind.model.data.RentalTransaction;
-import com.powerFind.model.domain.SaveLocationResult;
-import com.powerFind.repository.Implementation.PaymentRepositoryImpl;
-import com.powerFind.repository.Implementation.PowerbankRepositoryImpl;
-import com.powerFind.repository.Implementation.RentalTransactionRepositoryImpl;
+import com.powerFind.model.data.*;
+import com.powerFind.model.domain.DeviceAggregate;
+import com.powerFind.model.domain.PaymentEnum;
+import com.powerFind.model.domain.SaveLocationResultEnum;
+import com.powerFind.repository.Implementation.*;
 import com.powerFind.repository.LocationGroupRepository;
 import com.powerFind.repository.LocationRepository;
 import com.powerFind.repository.ModelMapper;
@@ -16,11 +14,13 @@ import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -36,44 +36,48 @@ public class PowerbankSystemService
 
     private final LocationGroupRepository locationGroupRepository;
     private final LocationRepository locationRepository;
+    private final MaintenanceLogRepositoryImpl maintenanceLogRepository;
     private final PaymentRepositoryImpl paymentRepository;
+    private final BatteryHealthRepositoryImpl batteryHealthRepository;
     private final PowerbankRepositoryImpl powerbankRepository;
     private final RentalTransactionRepositoryImpl rentalTransactionRepository;
     private final QueryService queryService;
 
-    public SaveLocationResult saveLocation(@Nonnull String city,
-                                           @Nonnull String district,
-                                           @Nonnull String address,
-                                           @Nonnull Double latitude,
-                                           @Nonnull Double longitude)
+    @Transactional(rollbackFor = Exception.class)
+    public SaveLocationResultEnum saveLocation(
+            @Nonnull String city,
+            @Nonnull String district,
+            @Nonnull String address,
+            @Nonnull Double latitude,
+            @Nonnull Double longitude)
     {
         if (queryService.exists(city, district, address))
         {
-            return SaveLocationResult.ALREADY_EXISTS;
+            return SaveLocationResultEnum.ALREADY_EXISTS;
         }
         try
         {
             UUID locationGroupId = UUID.randomUUID();
 
-            locationGroupRepository.saveLocationGroup(
+            locationGroupRepository.save(
                     ModelMapper.map(locationGroupId,
                             city,
                             district));
-            locationRepository.saveLocation(ModelMapper.map(UUID.randomUUID(),
+            locationRepository.save(ModelMapper.map(UUID.randomUUID(),
                     locationGroupId,
                     address,
                     latitude,
                     longitude));
-            return SaveLocationResult.SUCCESS;
+            return SaveLocationResultEnum.SUCCESS;
 
         } catch (Exception e)
         {
             log.error("Error saving location", e);
-            return SaveLocationResult.ERROR;
+            return SaveLocationResultEnum.ERROR;
         }
     }
 
-    @Nullable
+    @Transactional(rollbackFor = Exception.class)
     public Optional<List<Location>> getLocations()
     {
         return Optional.of(queryService.getAllWithGroup())
@@ -83,7 +87,76 @@ public class PowerbankSystemService
                         .collect(Collectors.toList()));
     }
 
-    @Nonnull
+    @Transactional(rollbackFor = Exception.class)
+    public Optional<UUID> savePowerbank(@Nonnull DeviceAggregate deviceAggregate)
+    {
+        UUID powerbankId = UUID.randomUUID();
+        UUID locationId = UUID.randomUUID();
+        UUID locationGroupId = UUID.randomUUID();
+
+        saveLocations(deviceAggregate.getLocation(), deviceAggregate.getLocationGroup(),
+                locationGroupId, locationId);
+
+        savePowerbank(deviceAggregate.getPowerbank(), deviceAggregate.getBatteryHealth(),
+                powerbankId, locationId);
+
+        Optional.ofNullable(deviceAggregate.getPowerbank().getMaintenanceNote()).ifPresent(
+                description -> maintenanceLogRepository.save(new MaintenanceLog(
+                        UUID.randomUUID(),
+                        powerbankId,
+                        description,
+                        Date.from(Instant.now())
+                ))
+        );
+
+        return Optional.of(powerbankId);
+    }
+
+    private void savePowerbank(com.powerFind.model.domain.Powerbank powerbank,
+                               com.powerFind.model.domain.BatteryHealth batteryHealth,
+                               UUID powerbankId, UUID locationId)
+    {
+        powerbankRepository.save(new Powerbank(
+                powerbankId,
+                powerbank.getModel(),
+                powerbank.getCapacityMah(),
+                powerbank.getStatus().name(),
+                powerbank.getChargeCycles(),
+                Date.from(Instant.now()),
+                locationId,
+                powerbank.getPricePerMinute()
+        ));
+
+        batteryHealthRepository.save(new com.powerFind.model.data.BatteryHealth(
+                UUID.randomUUID(),
+                powerbankId,
+                batteryHealth.getVoltage(),
+                batteryHealth.getHealthStatus().name(),
+                batteryHealth.getBatteryCheckedOn()
+        ));
+    }
+
+    private void saveLocations(com.powerFind.model.domain.Location location,
+                               com.powerFind.model.domain.LocationGroup locationGroup,
+                               UUID locationGroupId, UUID locationId)
+    {
+        locationGroupRepository.save(new LocationGroup(
+                locationGroupId,
+                locationGroup.getCity(),
+                locationGroup.getDistrict()
+        ));
+
+        locationRepository.save(new com.powerFind.model.data.Location(
+                locationId,
+                locationGroupId,
+                location.getAddress(),
+                location.getLatitude(),
+                location.getLongitude()
+        ));
+    }
+
+
+    @Transactional(rollbackFor = Exception.class)
     public Optional<Powerbank> getPowerbank(
             @Nonnull UUID userId,
             @Nullable Integer requestedDurationMinutes,
@@ -102,26 +175,26 @@ public class PowerbankSystemService
                                 : null;
 
                         UUID paymentId = UUID.randomUUID();
-                        Instant now = Instant.now();
+                        Instant presentТime = Instant.now();
 
                         paymentRepository.save(new Payment(
                                 paymentId,
                                 userId,
                                 totalAmount,
-                                "pending",
-                                Timestamp.from(now)
+                                PaymentEnum.PENDING,
+                                Timestamp.from(presentТime)
                         ));
 
                         Timestamp endTime = (requestedDurationMinutes != null)
                                 ? Timestamp.from(
-                                now.plus(requestedDurationMinutes, ChronoUnit.MINUTES))
+                                presentТime.plus(requestedDurationMinutes, ChronoUnit.MINUTES))
                                 : null;
 
                         rentalTransactionRepository.save(List.of(new RentalTransaction(
                                 UUID.randomUUID(),
                                 userId,
                                 powerbankId,
-                                Timestamp.from(now),
+                                Timestamp.from(presentТime),
                                 endTime,
                                 paymentId
                         )));

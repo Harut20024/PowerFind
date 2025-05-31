@@ -6,6 +6,6 @@ import jakarta.annotation.Nonnull;
 public interface LocationRepository
 {
 
-    void saveLocation(@Nonnull Location locations);
+    void save(@Nonnull Location locations);
 
 }

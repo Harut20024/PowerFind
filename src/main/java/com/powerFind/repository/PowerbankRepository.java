@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface PowerbankRepository
 {
+    void save(Powerbank powerbank);
 
     @Nonnull
     Optional<Powerbank> get(@Nonnull UUID id);

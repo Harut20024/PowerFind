@@ -1,10 +1,14 @@
 package com.powerFind.model.data;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Location
 {
     private UUID id;
@@ -12,5 +16,4 @@ public class Location
     private String address;
     private double latitude;
     private double longitude;
-    private LocationGroup locationGroup;
 }

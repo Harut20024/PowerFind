@@ -6,6 +6,7 @@ import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations;
 import org.springframework.stereotype.Repository;
 
@@ -21,6 +22,53 @@ import java.util.UUID;
 public class PowerbankRepositoryImpl implements PowerbankRepository
 {
     private final NamedParameterJdbcOperations jdbcOperations;
+
+    @Override
+    public void save(Powerbank powerbank)
+    {
+        String sql = """
+                INSERT INTO powerbank (
+                    id,
+                    model,
+                    capacity_mah,
+                    status,
+                    charge_cycles,
+                    last_maintenance,
+                    location_id,
+                    price_per_minute
+                ) VALUES (
+                    :id::uuid,
+                    :model,
+                    :capacityMah,
+                    :status,
+                    :chargeCycles,
+                    :lastMaintenance,
+                    :locationId::uuid,
+                    :pricePerMinute
+                )
+                """;
+
+        var params = new MapSqlParameterSource()
+                .addValue("id", powerbank.getId().toString())
+                .addValue("model", powerbank.getModel())
+                .addValue("capacityMah", powerbank.getCapacityMah())
+                .addValue("status", powerbank.getStatus())
+                .addValue("chargeCycles", powerbank.getChargeCycles())
+                .addValue("lastMaintenance", powerbank.getLastMaintenance())
+                .addValue("locationId", powerbank.getLocationId().toString())
+                .addValue("pricePerMinute", powerbank.getPricePerMinute());
+
+        int updatedRows = jdbcOperations.update(sql, params);
+
+        if (updatedRows == 0)
+        {
+            log.warn("Failed to insert powerbank with id: {}", powerbank.getId());
+        } else
+        {
+            log.info("Successfully inserted powerbank with id: {}", powerbank.getId());
+        }
+    }
+
 
     @Nonnull
     @Override

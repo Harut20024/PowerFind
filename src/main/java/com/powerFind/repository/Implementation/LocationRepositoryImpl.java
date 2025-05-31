@@ -19,7 +19,8 @@ public class LocationRepositoryImpl implements LocationRepository {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public void saveLocation(@Nonnull Location location) {
+    public void save(@Nonnull Location location)
+    {
         jdbcOperations.update(
                 """
                         INSERT INTO location (id, location_group_id, address, latitude, longitude)

@@ -1,5 +1,6 @@
 package com.powerFind.model.data;
 
+import com.powerFind.model.domain.PaymentEnum;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,6 @@ public class Payment
     private UUID id;
     private UUID userId;
     private BigDecimal amount;
-    private String status;
+    private PaymentEnum status;
     private Timestamp timestamp;
 }
