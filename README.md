@@ -51,3 +51,21 @@ For example, here’s a more detailed view of the `/public/powerbank` GET endpoi
 <img src="images/img_1.png" alt="img_1" style="width:60%; display:block; margin-bottom:5px;" />
 <img src="images/img_2.png" alt="img_2" style="width:60%; display:block;" />
 
+## Gateway
+
+In this project, I have implemented **Spring Cloud Gateway** as the central API routing layer.
+
+All external routes start with the prefix: `/api/v1`
+
+The gateway rewrites and forwards these requests to the backend under: `/public/`
+
+- `GET /api/v1/location` → backend `GET /public/location`
+- `POST /api/v1/powerbank` → backend `POST /public/powerbank`
+
+You can see the full route and filter configuration here:
+[**application.yml**](https://github.com/Harut20024/PowerGateway/blob/main/src/main/resources/application.yml)
+
+
+
+
+
