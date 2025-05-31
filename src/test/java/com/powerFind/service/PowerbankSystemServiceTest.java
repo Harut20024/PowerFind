@@ -209,7 +209,7 @@ class PowerbankSystemServiceTest
                 UUID.fromString(USER_ID),
                 2,
                 UUID.fromString(POWERBANK_ID)
-        ).get();
+        ).orElseThrow(() -> new IllegalStateException("Powerbank not found!"));
 
         assertEquals("Anker PowerCore 10000", powerbank.getModel());
         assertEquals(10000, powerbank.getCapacityMah());
