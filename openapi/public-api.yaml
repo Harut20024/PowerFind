@@ -7,7 +7,7 @@ info:
 
 
 paths:
-  /backoffice/location:
+  /public/location:
     get:
       summary: get available locations for powerbanks
       operationId: getLocation
@@ -59,7 +59,7 @@ paths:
         400:
           $ref: "#/components/responses/BadRequest"
 
-  /backoffice/powerbank:
+  /public/powerbank:
     get:
       summary: get available powerbank for user
       operationId: getPowerbank

@@ -1,7 +1,7 @@
 package com.powerFind.controller.backoffice;
 
 import com.powerFind.service.PowerbankSystemService;
-import com.powerfind.backoffice.api.BackofficeApi;
+import com.powerfind.backoffice.api.PublicApi;
 import com.powerfind.backoffice.model.EditResponse;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -17,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-public class BackofficeController implements BackofficeApi
+public class BackofficeController implements PublicApi
 {
 
     private final PowerbankSystemService powerbankSystemService;
