@@ -51,6 +51,24 @@ For example, here’s a more detailed view of the `/public/powerbank` GET endpoi
 <img src="images/img_1.png" alt="img_1" style="width:60%; display:block; margin-bottom:5px;" />
 <img src="images/img_2.png" alt="img_2" style="width:60%; display:block;" />
 
+## Test
+
+This project contains integration tests located in:
+
+`src/test/java/com/powerFind/service/PowerbankSystemServiceTest.java`
+
+In these tests:
+
+1) Used @SpringBootTest to load the full Spring application context.
+
+2) Test data directly using JdbcTemplate before each test (@BeforeEach).
+
+3) Clear all database tables before each test to ensure isolated and consistent test conditions.
+
+Perform assertions against the real database and service layer, verifying both data insertion and query results.
+These integration tests ensure that the interaction between the service layer, repositories, and database works as
+expected under real conditions.
+
 ## Gateway
 
 In this project, I have implemented **Spring Cloud Gateway** as the central API routing layer.
