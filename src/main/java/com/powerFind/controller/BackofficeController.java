@@ -1,4 +1,4 @@
-package com.powerFind.controller.backoffice;
+package com.powerFind.controller;
 
 import com.powerFind.repository.ModelMapper;
 import com.powerFind.service.PowerbankSystemService;
