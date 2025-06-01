@@ -132,6 +132,6 @@ docker run --name powerfind_app \
 -e SPRING_DATASOURCE_USERNAME=user \
 -e SPRING_DATASOURCE_PASSWORD=pass \
 -p 8080:8080 \
--d harut20024/powerfind:61414ca9ea5721e3ac14bb64a9ce32dbc0a1338b
+-d harut20024/powerfind:latest
 ```
 
