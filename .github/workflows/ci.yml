@@ -13,7 +13,7 @@ jobs:
       SPRING_PROFILES_ACTIVE: local
       SPRING_LIQUIBASE_ENABLED: true
       IMAGE_NAME: harut20024/powerfind
-      TAG: latest  # Always use the latest tag
+      TAG: latest
 
     steps:
       - name: Checkout repository
@@ -45,16 +45,11 @@ jobs:
           echo "Postgres did not start in time" >&2
           exit 1
 
-      - name: Set up Docker Buildx
-        run: |
-          docker buildx create --use
-          docker buildx inspect --bootstrap
-
-      - name: Build multi-platform Docker image
-        run: |
-          docker buildx build --platform linux/amd64,linux/arm64,windows/amd64 -t docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }} --push .
+      - name: Build Docker image with ComposeMore actions
+        run: docker compose build app
 
       - name: Tag and Push app image
         run: |
+          docker tag powerfind_app:latest docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker push docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
