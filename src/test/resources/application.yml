@@ -1,1 +1,8 @@
-w
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:14-alpine:///app
+    username: app
+    password: secret
+
+  liquibase:
+    change-log: classpath:/liquibase/master.xml
