@@ -1,5 +1,4 @@
-# File: .github/workflows/ci.yml
-name: CI Build, Test (via Testcontainers PostgreSQL), and Push Docker Image
+name: CI Build with Compose and Push Docker Image
 
 on:
   push:
@@ -10,18 +9,20 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    services:
+      docker:
+        image: docker:24.0.5
+        options: --privileged
+
     env:
-      # For production code (packaging), Spring loads application-local.yml → connects to real PostgreSQL at localhost:5432
       SPRING_PROFILES_ACTIVE: local
       SPRING_LIQUIBASE_ENABLED: true
-      # Docker repo and tag for Kaniko
       IMAGE_NAME: harut20024/powerfind
       TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        # — Clones your code into /home/runner/work/PowerFind/PowerFind
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -29,43 +30,30 @@ jobs:
           java-version: '21'
           distribution: temurin
           cache: gradle
-        # — Installs Java 21 and caches Gradle artifacts
 
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
-        # — Ensures gradlew script (and gradle/wrapper/gradle-wrapper.jar) at repo root is runnable
 
-      - name: Run tests with Testcontainers PostgreSQL
+      - name: Run tests (Testcontainers PostgreSQL)
         run: ./gradlew clean test
-        # — Because test/application.yml uses jdbc:tc:postgresql:14-alpine:///app, Testcontainers spins up a Postgres 14 container for tests
 
-      - name: Build JAR with Gradle
+      - name: Build Spring Boot JAR
         run: ./gradlew bootJar
-        # — Builds the Spring Boot fat JAR (build/libs/*.jar) under the ‘local’ profile (application-local.yml)
 
-      - name: Prepare Kaniko Docker credentials
-        run: |
-          mkdir -p "${{ runner.temp }}/docker"
-          cat <<EOF > "${{ runner.temp }}/docker/config.json"
-          {
-            "auths": {
-              "https://index.docker.io/v1/": {
-                "username": "${{ secrets.DOCKER_USERNAME }}",
-                "password": "${{ secrets.DOCKER_TOKEN }}"
-              }
-            }
-          }
-          EOF
-        # — Writes Docker Hub credentials so Kaniko can authenticate and push
+      - name: Start PostgreSQL with Docker Compose
+        run: docker compose up -d postgres
 
-      - name: Build and push Docker image with Kaniko
+      - name: Wait for PostgreSQL to be ready
         run: |
-          docker run \
-            -v "${{ github.workspace }}:/workspace" \
-            -v "${{ runner.temp }}/docker:/kaniko/.docker" \
-            gcr.io/kaniko-project/executor:latest \
-            --context /workspace \
-            --dockerfile /workspace/Dockerfile \
-            --destination docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
-            --cache=true
-        # — Kaniko reads Dockerfile (bellsoft/liberica-openjre-alpine:21), builds app.jar, and pushes harut20024/powerfind:<SHA>
+          echo "Waiting for Postgres..."
+          docker run --network host --rm busybox:1.36.1 \
+            sh -c 'until nc -z localhost 5432; do sleep 1; done'
+
+      - name: Build app Docker image with Compose
+        run: docker compose build
+
+      - name: Tag and Push image manually
+        run: |
+          docker tag power-postgres docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+          docker push docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}

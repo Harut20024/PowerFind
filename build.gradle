@@ -60,7 +60,7 @@ jacocoTestReport {
 }
 
 springBoot {
-	mainClass = 'com.powerfind.Application'
+	mainClass = 'com.powerfind.PowerFindApplication'
 }
 
 sourceSets {
