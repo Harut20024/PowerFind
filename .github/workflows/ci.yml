@@ -1,5 +1,5 @@
 # File: .github/workflows/ci.yml
-name: CI Build and Push
+name: CI Build, Test, and Push
 
 on:
   push:
@@ -13,29 +13,24 @@ jobs:
     env:
       IMAGE_NAME: haruttarzyan/powerfind
       TAG: ${{ github.sha }}
-      SPRING_PROFILES_ACTIVE: local
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 21 and cache Gradle
+      - name: Set up Java 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: temurin
-          cache: gradle
+          distribution: 'temurin'
 
-      - name: Install Gradle 8.0
-        uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: '8.0'
+      - name: Make Gradle Wrapper executable
+        run: chmod +x ./gradlew
 
-      - name: Run tests and build JAR
-        run: |
-          gradle clean build --no-daemon
+      - name: Build and run tests with Gradle
+        run: ./gradlew clean build
 
-      - name: Prepare Kaniko credentials
+      - name: Prepare Kaniko Docker config
         run: |
           mkdir -p "${{ runner.temp }}/docker"
           cat <<EOF > "${{ runner.temp }}/docker/config.json"
