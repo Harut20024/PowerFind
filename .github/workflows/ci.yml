@@ -1,3 +1,4 @@
+# File: .github/workflows/ci.yml
 name: CI Build and Push
 
 on:
@@ -9,19 +10,35 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    env:
+      IMAGE_NAME: haruttarzyan/powerfind
+      TAG: ${{ github.sha }}
+      SPRING_PROFILES_ACTIVE: local
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up JDK 21
+      # Install Java 21 and enable Gradle cache
+      - name: Set up JDK 21 and cache Gradle
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: temurin
+          cache: gradle
 
+      # Install Gradle on the runner so we can call 'gradle clean build' directly
+      - name: Set up Gradle
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: --version
+
+      # Build and test using the installed Gradle
       - name: Run tests and build JAR
-        run: ./gradlew clean build
+        run: |
+          gradle clean build --no-daemon
 
+      # Prepare Kaniko's Docker credentials (uses the GitHub secrets you already created)
       - name: Prepare Kaniko credentials
         run: |
           mkdir -p "${{ runner.temp }}/docker"
@@ -36,6 +53,7 @@ jobs:
           }
           EOF
 
+      # Use Kaniko (the official executor image) to build & push the Dockerfile
       - name: Build and push Docker image with Kaniko
         run: |
           docker run \
@@ -44,5 +62,5 @@ jobs:
             gcr.io/kaniko-project/executor:latest \
             --context /workspace \
             --dockerfile /workspace/Dockerfile \
-            --destination docker.io/${{ secrets.DOCKER_USERNAME }}/powerfind:${{ github.sha }} \
+            --destination docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
             --cache=true
