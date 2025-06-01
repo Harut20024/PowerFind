@@ -83,7 +83,55 @@ The gateway rewrites and forwards these requests to the backend under: `/public/
 You can see the full route and filter configuration here:
 [**application.yml**](https://github.com/Harut20024/PowerGateway/blob/main/src/main/resources/application.yml)
 
+## CI/CD
 
+This repository includes a CI/CD pipeline that automatically builds and pushes the Docker image of the PowerFind
+application. It is set up using GitHub Actions, which builds the project using Gradle, starts PostgreSQL with Docker
+Compose, and pushes the Docker image to Docker Hub. Whenever changes are pushed to the main branch, the pipeline ensures
+that the latest version of the image is built and deployed. You can find the CI/CD configuration file in the
+`.github/workflows` directory under the name ci.yml.
 
+## Local run
 
+To run the application locally, you can choose one of the following methods. Ensure you have Docker and JDK 21
+installed.
+
+1) Run Spring Boot App and Local PostgreSQL Docker:
+
+   Start your Spring Boot application and PostgreSQL container locally.
+
+2) Use Docker Compose (Java + PostgreSQL)
+
+   Run both Java and PostgreSQL together using Docker Compose.
+
+3) Manually Run Docker Containers:
+
+   Pull the image from Docker Hub:
+
+```bash
+docker pull harut20024/powerfind:latest
+```
+
+Run PostgreSQL container:
+
+```bash
+docker run --name power-postgres \
+-e POSTGRES_USER=user \
+-e POSTGRES_PASSWORD=pass \
+-e POSTGRES_DB=powerDB \
+-p 5432:5432 \
+-d postgres:14
+```
+
+Run PowerFind application container:
+
+```bash
+docker run --name powerfind_app \
+--link power-postgres:postgres \
+-e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/powerDB \
+-e SPRING_DATASOURCE_USERNAME=user \
+-e SPRING_DATASOURCE_PASSWORD=pass \
+-p 8080:8080 \
+-d harut20024/powerfind:61414ca9ea5721e3ac14bb64a9ce32dbc0a1338b
+```
 
