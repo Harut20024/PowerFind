@@ -10,7 +10,7 @@ I use a layered Spring Boot architecture including controller, service, reposito
 PostgresSQL database, as illustrated in the image. Spring Boot simplifies my development by managing configurations,
 dependencies, and providing built-in support for RESTful APIs and data persistence.
 
-![img_3.png](images/img_3.png)
+![img.png](images/img_4.png)
 
 ## Controller
 
@@ -44,12 +44,12 @@ The OpenAPI spec makes the API well-documented, easy to integrate, and simple to
 
 Here’s a visual overview of the available endpoints:
 
-<img src="images/img.png" alt="img" style="width:60%; display:block; margin-bottom:20px;" />
+<img src="images/img.png" alt="img" style="width:100%; display:block; margin-bottom:20px;" />
 
 For example, here’s a more detailed view of the `/public/powerbank` GET endpoint:
 
-<img src="images/img_1.png" alt="img_1" style="width:60%; display:block; margin-bottom:5px;" />
-<img src="images/img_2.png" alt="img_2" style="width:60%; display:block;" />
+<img src="images/img_1.png" alt="img_1" style="width:100%; display:block; margin-bottom:5px;" />
+<img src="images/img_2.png" alt="img_2" style="width:100%; display:block;" />
 
 ## Test
 
