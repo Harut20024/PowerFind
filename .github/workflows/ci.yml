@@ -53,3 +53,4 @@ jobs:
           docker tag powerfind_app:latest docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker push docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+
