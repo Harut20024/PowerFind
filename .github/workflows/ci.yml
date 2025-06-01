@@ -13,7 +13,7 @@ jobs:
       SPRING_PROFILES_ACTIVE: local
       SPRING_LIQUIBASE_ENABLED: true
       IMAGE_NAME: harut20024/powerfind
-      TAG: latest
+      TAG: latest  # Always use the latest tag
 
     steps:
       - name: Checkout repository
@@ -57,4 +57,4 @@ jobs:
       - name: Tag and Push app image
         run: |
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker push docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}  # Push with the 'latest' tag
+          docker push docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
