@@ -9,10 +9,6 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    env:
-      IMAGE_NAME: haruttarzyan/powerfind
-      TAG: latest
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -26,16 +22,27 @@ jobs:
       - name: Run tests and build JAR
         run: ./gradlew clean build
 
-      - name: Create Kaniko Docker config
+      - name: Prepare Kaniko credentials
         run: |
-          mkdir -p /kaniko/.docker
-          echo '{"auths":{"https://index.docker.io/v1/":{"username":"${{ secrets.DOCKER_USERNAME }}","password":"${{ secrets.DOCKER_TOKEN }}"}}}' > /kaniko/.docker/config.json
+          mkdir -p "${{ runner.temp }}/docker"
+          cat <<EOF > "${{ runner.temp }}/docker/config.json"
+          {
+            "auths": {
+              "https://index.docker.io/v1/": {
+                "username": "${{ secrets.DOCKER_USERNAME }}",
+                "password": "${{ secrets.DOCKER_TOKEN }}"
+              }
+            }
+          }
+          EOF
 
       - name: Build and push Docker image with Kaniko
-        uses: aevea/action-kaniko@v0.10.0
-        with:
-          image: gcr.io/kaniko-project/executor:latest
-          args: >
-            --dockerfile Dockerfile
-            --context ${{ github.workspace }}
-            --destination docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+        run: |
+          docker run \
+            -v "${{ github.workspace }}:/workspace" \
+            -v "${{ runner.temp }}/docker:/kaniko/.docker" \
+            gcr.io/kaniko-project/executor:latest \
+            --context /workspace \
+            --dockerfile /workspace/Dockerfile \
+            --destination docker.io/${{ secrets.DOCKER_USERNAME }}/powerfind:${{ github.sha }} \
+            --cache=true
