@@ -13,7 +13,7 @@ jobs:
       SPRING_PROFILES_ACTIVE: local
       SPRING_LIQUIBASE_ENABLED: true
       IMAGE_NAME: harut20024/powerfind
-      TAG: ${{ github.sha }}
+      TAG: latest
 
     steps:
       - name: Checkout repository
