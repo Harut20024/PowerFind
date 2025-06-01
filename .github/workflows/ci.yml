@@ -1,3 +1,4 @@
+# File: .github/workflows/ci.yml
 name: CI Build with Compose and Push Docker Image
 
 on:
@@ -8,11 +9,6 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:24.0.5
-        options: --privileged
 
     env:
       SPRING_PROFILES_ACTIVE: local
@@ -34,11 +30,8 @@ jobs:
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
 
-      - name: Run tests (Testcontainers PostgreSQL)
-        run: ./gradlew clean test
-
-      - name: Build Spring Boot JAR
-        run: ./gradlew bootJar
+      - name: Build and run tests
+        run: ./gradlew clean build
 
       - name: Start PostgreSQL with Docker Compose
         run: docker compose up -d postgres
@@ -46,14 +39,18 @@ jobs:
       - name: Wait for PostgreSQL to be ready
         run: |
           echo "Waiting for Postgres..."
-          docker run --network host --rm busybox:1.36.1 \
-            sh -c 'until nc -z localhost 5432; do sleep 1; done'
+          for i in {1..30}; do
+            if nc -z localhost 5432; then echo "Postgres is up"; exit 0; fi
+            sleep 1
+          done
+          echo "Postgres did not start in time" >&2
+          exit 1
 
-      - name: Build app Docker image with Compose
-        run: docker compose build
+      - name: Build Docker image with Compose
+        run: docker compose build app
 
-      - name: Tag and Push image manually
+      - name: Tag and Push app image
         run: |
-          docker tag power-postgres docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
+          docker tag powerfind_app:latest docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
           docker push docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }}
