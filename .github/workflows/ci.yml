@@ -1,5 +1,4 @@
-# File: .github/workflows/ci.yml
-name: CI Build, Test, and Push
+name: CI Build, Test with PostgreSQL, and Push Docker Image
 
 on:
   push:
@@ -10,7 +9,24 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
+    services:
+      postgres:
+        image: postgres:14
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_DB: powerDB
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: pass
+        options: >-
+          --health-cmd "pg_isready -U user -d powerDB"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     env:
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_LIQUIBASE_ENABLED: true
       IMAGE_NAME: haruttarzyan/powerfind
       TAG: ${{ github.sha }}
 
@@ -18,17 +34,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Set up Java 21
+      - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
-          distribution: 'temurin'
+          distribution: temurin
+          cache: gradle
 
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
 
       - name: Build and run tests with Gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean test
+
+      - name: Build JAR with Gradle
+        run: ./gradlew bootJar
 
       - name: Prepare Kaniko Docker config
         run: |
