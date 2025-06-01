@@ -5,7 +5,7 @@ services:
     image: postgres:14
     container_name: power-postgres
     ports:
-      - "5440:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass

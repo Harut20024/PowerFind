@@ -1,4 +1,5 @@
-name: CI Build, Test with PostgreSQL, and Push Docker Image
+# File: .github/workflows/ci.yml
+name: CI Build, Test (via Testcontainers PostgreSQL), and Push Docker Image
 
 on:
   push:
@@ -9,30 +10,18 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:14
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_DB: powerDB
-          POSTGRES_USER: user
-          POSTGRES_PASSWORD: pass
-        options: >-
-          --health-cmd "pg_isready -U user -d powerDB"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     env:
+      # For production code (packaging), Spring loads application-local.yml → connects to real PostgreSQL at localhost:5432
       SPRING_PROFILES_ACTIVE: local
       SPRING_LIQUIBASE_ENABLED: true
-      IMAGE_NAME: haruttarzyan/powerfind
+      # Docker repo and tag for Kaniko
+      IMAGE_NAME: harut20024/powerfind
       TAG: ${{ github.sha }}
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
+        # — Clones your code into /home/runner/work/PowerFind/PowerFind
 
       - name: Set up JDK 21
         uses: actions/setup-java@v3
@@ -40,17 +29,21 @@ jobs:
           java-version: '21'
           distribution: temurin
           cache: gradle
+        # — Installs Java 21 and caches Gradle artifacts
 
       - name: Make Gradle Wrapper executable
         run: chmod +x ./gradlew
+        # — Ensures gradlew script (and gradle/wrapper/gradle-wrapper.jar) at repo root is runnable
 
-      - name: Build and run tests with Gradle
+      - name: Run tests with Testcontainers PostgreSQL
         run: ./gradlew clean test
+        # — Because test/application.yml uses jdbc:tc:postgresql:14-alpine:///app, Testcontainers spins up a Postgres 14 container for tests
 
       - name: Build JAR with Gradle
         run: ./gradlew bootJar
+        # — Builds the Spring Boot fat JAR (build/libs/*.jar) under the ‘local’ profile (application-local.yml)
 
-      - name: Prepare Kaniko Docker config
+      - name: Prepare Kaniko Docker credentials
         run: |
           mkdir -p "${{ runner.temp }}/docker"
           cat <<EOF > "${{ runner.temp }}/docker/config.json"
@@ -63,6 +56,7 @@ jobs:
             }
           }
           EOF
+        # — Writes Docker Hub credentials so Kaniko can authenticate and push
 
       - name: Build and push Docker image with Kaniko
         run: |
@@ -74,3 +68,4 @@ jobs:
             --dockerfile /workspace/Dockerfile \
             --destination docker.io/${{ env.IMAGE_NAME }}:${{ env.TAG }} \
             --cache=true
+        # — Kaniko reads Dockerfile (bellsoft/liberica-openjre-alpine:21), builds app.jar, and pushes harut20024/powerfind:<SHA>
