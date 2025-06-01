@@ -55,7 +55,7 @@ For example, here’s a more detailed view of the `/public/powerbank` GET endpoi
 
 This project contains integration tests located in:
 
-`src/test/java/com/powerFind/service/PowerbankSystemServiceTest.java`
+`src/test/java/com/powerFind/`
 
 In these tests:
 
