@@ -45,8 +45,8 @@ jobs:
           echo "Postgres did not start in time" >&2
           exit 1
 
-      - name: Build Docker image with ComposeMore actions
-        run: docker compose build app
+      - name: Build Docker image
+        run: docker build -t powerfind_app:latest .
 
       - name: Tag and Push app image
         run: |
