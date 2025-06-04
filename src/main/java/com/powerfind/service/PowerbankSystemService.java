@@ -41,6 +41,7 @@ public class PowerbankSystemService
     private final BatteryHealthRepositoryImpl batteryHealthRepository;
     private final PowerbankRepositoryImpl powerbankRepository;
     private final RentalTransactionRepositoryImpl rentalTransactionRepository;
+    private final PowerbankKafkaProducer kafkaProducer;
     private final QueryService queryService;
 
     @Transactional(rollbackFor = Exception.class)
@@ -108,6 +109,10 @@ public class PowerbankSystemService
                         Date.from(Instant.now())
                 ))
         );
+
+        kafkaProducer.send(powerbankId.toString(),
+                "Powerbank saved with ID: " + powerbankId + ", Model: " +
+                        deviceAggregate.getPowerbank().getModel());
 
         return Optional.of(powerbankId);
     }

@@ -91,6 +91,24 @@ Compose, and pushes the Docker image to Docker Hub. Whenever changes are pushed 
 that the latest version of the image is built and deployed. You can find the CI/CD configuration file in the
 `.github/workflows` directory under the name ci.yml.
 
+## kafka
+
+Kafka is used to send and receive messages between different parts of an application. It allows services to communicate
+by producing and consuming messages through a messaging system.
+
+Producer
+A producer is responsible for creating and sending messages to a Kafka topic.
+In this project, when a new power bank is saved, the application sends a message
+containing details such as the power bank ID and model to the powerbank-events topic.
+
+Consumer
+A consumer reads messages from a Kafka topic.
+In this project, the consumer listens to the `powerbank-topic` topic. When a message arrives, the consumer receives it
+and can perform actions.
+
+screen how they log`
+![img.png](images/img_5.png)
+
 ## Local run
 
 To run the application locally, you can choose one of the following methods. Ensure you have Docker and JDK 21
@@ -100,11 +118,7 @@ installed.
 
    Start your Spring Boot application and PostgreSQL container locally.
 
-2) Use Docker Compose (Java + PostgreSQL)
-
-   Run both Java and PostgreSQL together using Docker Compose.
-
-3) Manually Run Docker Containers:
+2) Manually Run Docker Containers:
 
    Pull the image from Docker Hub:
 

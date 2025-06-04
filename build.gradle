@@ -21,7 +21,10 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc:3.2.3'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.2.3'
 
-	// PostgreSQL & Liquibase
+    //kafka
+    implementation 'org.springframework.kafka:spring-kafka:3.3.3'
+
+    // PostgreSQL & Liquibase
 	implementation 'org.postgresql:postgresql:42.7.3'
 	implementation 'org.liquibase:liquibase-core:4.26.0'
 

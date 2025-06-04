@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class PowerbankSystemServiceTest
@@ -49,6 +51,9 @@ class PowerbankSystemServiceTest
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @MockBean
+    private PowerbankKafkaProducer kafkaProducer;
 
     @BeforeEach
     void setupDatabase()
@@ -201,6 +206,9 @@ class PowerbankSystemServiceTest
         var savedPowerbank = powerbankRepository.get(savedId).orElseThrow();
         assertEquals("Anker PowerCore 26800", savedPowerbank.getModel());
         assertEquals(26800, savedPowerbank.getCapacityMah());
+
+        verify(kafkaProducer, times(1))
+                .send(anyString(), contains("Powerbank saved with ID"));
     }
 
     @Test
