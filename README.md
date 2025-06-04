@@ -69,6 +69,8 @@ Perform assertions against the real database and service layer, verifying both d
 These integration tests ensure that the interaction between the service layer, repositories, and database works as
 expected under real conditions.
 
+![img.png](images/img_7.png)
+
 ## Gateway
 
 In this project, I have implemented **Spring Cloud Gateway** as the central API routing layer.
@@ -91,6 +93,8 @@ Compose, and pushes the Docker image to Docker Hub. Whenever changes are pushed 
 that the latest version of the image is built and deployed. You can find the CI/CD configuration file in the
 `.github/workflows` directory under the name ci.yml.
 
+![img.png](images/img_6.png)
+
 ## kafka
 
 Kafka is used to send and receive messages between different parts of an application. It allows services to communicate
@@ -106,7 +110,7 @@ A consumer reads messages from a Kafka topic.
 In this project, the consumer listens to the `powerbank-topic` topic. When a message arrives, the consumer receives it
 and can perform actions.
 
-screen how they log`
+here is logs of Producer and Consumer`
 ![img.png](images/img_5.png)
 
 ## Local run
