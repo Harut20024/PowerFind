@@ -95,7 +95,7 @@ that the latest version of the image is built and deployed. You can find the CI/
 
 ![img.png](images/img_6.png)
 
-## kafka
+## Kafka
 
 Kafka is used to send and receive messages between different parts of an application. It allows services to communicate
 by producing and consuming messages through a messaging system.
@@ -112,6 +112,35 @@ and can perform actions.
 
 here is logs of Producer and Consumer`
 ![img.png](images/img_5.png)
+
+## Monitoring
+
+In this project, I use **Prometheus** and **Grafana** to monitor our Spring Boot application.
+
+What they do
+
+- **Prometheus** collects metrics from the app every few seconds (like CPU usage, request count, etc.).
+- **Grafana** shows these metrics in charts and dashboards.
+
+Together, they help us see how the app is performing in real-time.
+
+How it works
+
+1. **Spring Boot** exposes metrics at: `http://localhost:8080/actuator/prometheus`
+2. **Prometheus** runs in Docker and pulls metrics from that endpoint every 15 seconds.  
+   File: `monitoring/prometheus.yml`
+3. **Grafana** also runs in Docker and reads data from Prometheus.  
+   It loads dashboards from JSON files in `monitoring/grafana/dashboards/`
+
+How to See the Results
+
+1. Run docker-compose
+
+Prometheus (metrics storage & queries): http://localhost:9090
+
+Grafana (visual dashboards,Login: admin,Pass: admin): http://localhost:3000
+
+![img.png](images/img_8.png)
 
 ## Local run
 

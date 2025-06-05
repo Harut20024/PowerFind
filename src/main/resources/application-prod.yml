@@ -1,0 +1,9 @@
+spring:
+  kafka:
+    bootstrap-servers: kafka:9092
+  datasource:
+    url: jdbc:postgresql://power-postgres:5432/powerDB
+    username: user
+    password: pass
+    driver-class-name: org.postgresql.Driver
+

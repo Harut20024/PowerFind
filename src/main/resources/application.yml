@@ -1,26 +1,32 @@
 spring:
   kafka:
     bootstrap-servers: localhost:9092
+
     consumer:
       group-id: powerbank-group
       auto-offset-reset: latest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+
   main:
     banner-mode: "off"
+
   liquibase:
     change-log: classpath:/liquibase/master.xml
+
   datasource:
     url: jdbc:postgresql://localhost:5432/powerDB
     username: user
     password: pass
     driver-class-name: org.postgresql.Driver
+
 management:
   endpoints:
     web:
-      base-path: /manage
+      base-path: /actuator
       exposure:
-        include: health,prometheus,loggers
+        include: health, prometheus, loggers
