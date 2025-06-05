@@ -144,41 +144,7 @@ Grafana (visual dashboards,Login: admin,Pass: admin): http://localhost:3000
 
 ## Local run
 
-To run the application locally, you can choose one of the following methods. Ensure you have Docker and JDK 21
-installed.
+Make sure Docker and JDK 21 are installed.
 
-1) Run Spring Boot App and Local PostgreSQL Docker:
-
-   Start your Spring Boot application and PostgreSQL container locally.
-
-2) Manually Run Docker Containers:
-
-   Pull the image from Docker Hub:
-
-```bash
-docker pull harut20024/powerfind:latest
-```
-
-Run PostgreSQL container:
-
-```bash
-docker run --name power-postgres \
--e POSTGRES_USER=user \
--e POSTGRES_PASSWORD=pass \
--e POSTGRES_DB=powerDB \
--p 5432:5432 \
--d postgres:14
-```
-
-Run PowerFind application container:
-
-```bash
-docker run --name powerfind_app \
---link power-postgres:postgres \
--e SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/powerDB \
--e SPRING_DATASOURCE_USERNAME=user \
--e SPRING_DATASOURCE_PASSWORD=pass \
--p 8080:8080 \
--d harut20024/powerfind:latest
-```
+Start your Spring Boot application locally, then run `docker-compose up` to start PostgreSQL, Kafka, Prometheus, and Grafana.
 
