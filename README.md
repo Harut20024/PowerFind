@@ -12,24 +12,24 @@ dependencies, and providing built-in support for RESTful APIs and data persisten
 
 ![img.png](images/img_4.png)
 
-## Controller
+### Controller
 
 The controller layer handles HTTP requests and routes them to the appropriate service calls.
 Using OpenAPI, I generate interfaces with predefined routes, then implement them in the controllers to provide logic.
 The controllers receive parameters via generated external models, transform them into domain objects, and pass them to
 the service layer for processing.
 
-## Service
+### Service
 
 The service layer contains the core business logic.
 It processes data and connects the controller with the repository.
 
-## Repository
+### Repository
 
 The repository layer handles all database access.
 It communicates directly with PostgresSQL to store and retrieve data.
 
-## Database
+### Database
 
 I use a PostgresSQL database to persist all system data, integrated with Spring Boot via JDBC.
 For migrations, I use Liquibase and have written an additional .sql-formatted migration to insert example data into the
@@ -51,26 +51,6 @@ For example, here’s a more detailed view of the `/public/powerbank` GET endpoi
 <img src="images/img_1.png" alt="img_1" style="width:100%; display:block; margin-bottom:5px;" />
 <img src="images/img_2.png" alt="img_2" style="width:100%; display:block;" />
 
-## Test
-
-This project contains integration tests located in:
-
-`src/test/java/com/powerFind/`
-
-In these tests:
-
-1) Used @SpringBootTest to load the full Spring application context.
-
-2) Test data directly using JdbcTemplate before each test (@BeforeEach).
-
-3) Clear all database tables before each test to ensure isolated and consistent test conditions.
-
-Perform assertions against the real database and service layer, verifying both data insertion and query results.
-These integration tests ensure that the interaction between the service layer, repositories, and database works as
-expected under real conditions.
-
-![img.png](images/img_7.png)
-
 ## Gateway
 
 In this project, I have implemented **Spring Cloud Gateway** as the central API routing layer.
@@ -84,16 +64,6 @@ The gateway rewrites and forwards these requests to the backend under: `/public/
 
 You can see the full route and filter configuration here:
 [**application.yml**](https://github.com/Harut20024/PowerGateway/blob/main/src/main/resources/application.yml)
-
-## CI/CD
-
-This repository includes a CI/CD pipeline that automatically builds and pushes the Docker image of the PowerFind
-application. It is set up using GitHub Actions, which builds the project using Gradle, starts PostgreSQL with Docker
-Compose, and pushes the Docker image to Docker Hub. Whenever changes are pushed to the main branch, the pipeline ensures
-that the latest version of the image is built and deployed. You can find the CI/CD configuration file in the
-`.github/workflows` directory under the name ci.yml.
-
-![img.png](images/img_6.png)
 
 ## Kafka
 
@@ -142,9 +112,10 @@ Grafana (visual dashboards,Login: admin,Pass: admin): http://localhost:3000
 
 ![img.png](images/img_8.png)
 
-**Loki Logging**
+### Loki Logging
 
-In addition to metrics monitoring, this project uses Loki and Promtail for log aggregation and viewing in Grafana.
+In addition to metrics monitoring, this project uses **Loki** and **Promtail** for log aggregation and viewing in
+Grafana.
 How it works
 
 1) The Spring Boot application writes logs to a file, e.g. logs/powerfind.log
@@ -157,10 +128,41 @@ How it works
 
 ![img.png](images/img_9.png)
 
+## CI/CD
+
+This repository includes a CI/CD pipeline that automatically builds and pushes the Docker image of the PowerFind
+application. It is set up using GitHub Actions, which builds the project using Gradle, starts PostgreSQL with Docker
+Compose, and pushes the Docker image to Docker Hub. Whenever changes are pushed to the main branch, the pipeline ensures
+that the latest version of the image is built and deployed. You can find the CI/CD configuration file in the
+`.github/workflows` directory under the name ci.yml.
+
+![img.png](images/img_6.png)
+
+## Test
+
+This project contains integration tests located in:
+
+`src/test/java/com/powerFind/`
+
+In these tests:
+
+1) Used @SpringBootTest to load the full Spring application context.
+
+2) Test data directly using JdbcTemplate before each test (@BeforeEach).
+
+3) Clear all database tables before each test to ensure isolated and consistent test conditions.
+
+Perform assertions against the real database and service layer, verifying both data insertion and query results.
+These integration tests ensure that the interaction between the service layer, repositories, and database works as
+expected under real conditions.
+
+![img.png](images/img_7.png)
+
 ## Local run
 
 Make sure Docker and JDK 21 are installed.
 
 Start your Spring Boot application locally, then run `docker-compose up` to start PostgreSQL, Kafka, Prometheus, and
 Grafana.
+
 
