@@ -17,11 +17,10 @@ storage_config:
     cache_location: /loki/index_cache
     shared_store: filesystem
 
-# ⬇⬇⬇  НОВЫЙ блок
 ingester:
   wal:
     enabled: true
-    dir: /loki/wal      # ← внутри нашего тома
+    dir: /loki/wal
 
 schema_config:
   configs:
