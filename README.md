@@ -142,9 +142,25 @@ Grafana (visual dashboards,Login: admin,Pass: admin): http://localhost:3000
 
 ![img.png](images/img_8.png)
 
+**Loki Logging**
+
+In addition to metrics monitoring, this project uses Loki and Promtail for log aggregation and viewing in Grafana.
+How it works
+
+1) The Spring Boot application writes logs to a file, e.g. logs/powerfind.log
+
+2) Promtail is configured to watch this log file and send logs to Loki
+
+3) Loki runs in Docker and stores logs
+
+4) Grafana has Loki as a data source and can display logs in the Explore tab
+
+![img.png](images/img_9.png)
+
 ## Local run
 
 Make sure Docker and JDK 21 are installed.
 
-Start your Spring Boot application locally, then run `docker-compose up` to start PostgreSQL, Kafka, Prometheus, and Grafana.
+Start your Spring Boot application locally, then run `docker-compose up` to start PostgreSQL, Kafka, Prometheus, and
+Grafana.
 
