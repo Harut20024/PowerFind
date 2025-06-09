@@ -35,6 +35,29 @@ I use a PostgresSQL database to persist all system data, integrated with Spring 
 For migrations, I use Liquibase and have written an additional .sql-formatted migration to insert example data into the
 database.
 
+### Exception
+
+This project uses `@ControllerAdvice` to handle all exceptions in one place and return consistent JSON error responses.
+
+#### Here's how each exception is handled:
+
+1) MethodArgumentNotValidException is thrown when request body validation fails, such as missing or incorrect fields.
+
+2) ConstraintViolationException occurs when query parameters or path variables do not meet validation rules.
+
+3) ResponseStatusException is used to manually return HTTP errors like 404 when a resource is not found.
+
+4) ResponseCodeException is a custom exception for business logic errors, allowing custom HTTP status codes and
+   messages.
+
+4) NoResourceFoundException is triggered when a requested static resource like a file or page does not exist.
+
+5) MethodArgumentTypeMismatchException happens when a request parameter has the wrong data type, like an invalid UUID.
+
+6) HttpMessageNotReadableException is thrown when the request body is missing or cannot be parsed, such as invalid JSON.
+
+7) Exception is a global fallback for any other unexpected errors, returning a 500 Internal Server Error
+
 ## OpenAPI
 
 This project includes an OpenAPI specification that defines the available API endpoints.
