@@ -2,5 +2,6 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
     <include file="changelog/00000000_initial_schema.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/10062025_add_audit_table.xml" relativeToChangelogFile="true"/>
     <include file="changelog/29052025_insert_data.sql" relativeToChangelogFile="true"/>
 </databaseChangeLog>

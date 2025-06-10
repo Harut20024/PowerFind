@@ -58,6 +58,17 @@ This project uses `@ControllerAdvice` to handle all exceptions in one place and 
 
 7) Exception is a global fallback for any other unexpected errors, returning a 500 Internal Server Error
 
+## Audit
+
+In this project, I added an audit feature.
+It helps track important actions, like when someone adds or checks locations
+and powerbanks. When the app does something important, a special tool called `AOP` saves the action automatically into a
+database. It writes down what action happened, like `INSERT` (adding) or `READ`, and which method was called.
+
+Here's how it looks in the database:
+
+![img.png](images/img_10.png)
+
 ## OpenAPI
 
 This project includes an OpenAPI specification that defines the available API endpoints.

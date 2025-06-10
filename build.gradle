@@ -21,6 +21,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc:3.2.3'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator:3.2.3'
 
+    //AOP
+    implementation 'org.springframework.boot:spring-boot-starter-aop:3.2.3'
+
     //kafka
     implementation 'org.springframework.kafka:spring-kafka:3.3.3'
 

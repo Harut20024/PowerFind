@@ -1,5 +1,6 @@
 package com.powerfind.service;
 
+import com.powerfind.audit.Auditable;
 import com.powerfind.backoffice.model.Location;
 import com.powerfind.model.data.*;
 import com.powerfind.model.domain.DeviceAggregate;
@@ -34,6 +35,11 @@ import static java.util.function.Predicate.not;
 public class PowerbankSystemService
 {
 
+    public static final String INSERT = "INSERT";
+    public static final String POWERBANK = "powerbank";
+    public static final String LOCATION = "location";
+    public static final String READ = "READ";
+
     private final LocationGroupRepository locationGroupRepository;
     private final LocationRepository locationRepository;
     private final MaintenanceLogRepositoryImpl maintenanceLogRepository;
@@ -44,6 +50,7 @@ public class PowerbankSystemService
     private final PowerbankKafkaProducer kafkaProducer;
     private final QueryService queryService;
 
+    @Auditable(action = INSERT, table = LOCATION)
     @Transactional(rollbackFor = Exception.class)
     public SaveLocationResultEnum saveLocation(
             @Nonnull String city,
@@ -78,6 +85,7 @@ public class PowerbankSystemService
         }
     }
 
+    @Auditable(action = READ, table = LOCATION)
     @Transactional(rollbackFor = Exception.class)
     public Optional<List<Location>> getLocations()
     {
@@ -88,6 +96,7 @@ public class PowerbankSystemService
                         .collect(Collectors.toList()));
     }
 
+    @Auditable(action = INSERT, table = POWERBANK)
     @Transactional(rollbackFor = Exception.class)
     public Optional<UUID> savePowerbank(@Nonnull DeviceAggregate deviceAggregate)
     {
@@ -160,7 +169,7 @@ public class PowerbankSystemService
         ));
     }
 
-
+    @Auditable(action = READ, table = POWERBANK)
     @Transactional(rollbackFor = Exception.class)
     public Optional<Powerbank> getPowerbank(
             @Nonnull UUID userId,
