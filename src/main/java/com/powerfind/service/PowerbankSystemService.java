@@ -14,8 +14,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -27,8 +29,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static java.util.function.Predicate.not;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -36,10 +36,15 @@ public class PowerbankSystemService
 {
 
     public static final String INSERT = "INSERT";
+    public static final String READ = "READ";
     public static final String POWERBANK = "powerbank";
     public static final String LOCATION = "location";
-    public static final String READ = "READ";
+    public static final String GET_LOCATIONS = "getLocations";
+    public static final String GET_POWERBANK = "getPowerbank";
+    public static final String SAVE_LOCATION = "saveLocation";
+    public static final String SAVE_POWERBANK = "savePowerbank";
 
+    private final AccessControlService accessControlService;
     private final LocationGroupRepository locationGroupRepository;
     private final LocationRepository locationRepository;
     private final MaintenanceLogRepositoryImpl maintenanceLogRepository;
@@ -53,29 +58,38 @@ public class PowerbankSystemService
     @Auditable(action = INSERT, table = LOCATION)
     @Transactional(rollbackFor = Exception.class)
     public SaveLocationResultEnum saveLocation(
+            @Nonnull String role,
             @Nonnull String city,
             @Nonnull String district,
             @Nonnull String address,
             @Nonnull Double latitude,
             @Nonnull Double longitude)
     {
-        if (queryService.exists(city, district, address))
-        {
-            return SaveLocationResultEnum.ALREADY_EXISTS;
-        }
+        return Optional.of(role)
+                .filter(currentRole -> accessControlService.isAllowed(currentRole, SAVE_LOCATION))
+                .map(currentRole -> queryService.exists(city, district, address)
+                        ? SaveLocationResultEnum.ALREADY_EXISTS
+                        : saveNewLocation(city, district, address, latitude, longitude))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
+                        "Access denied for role: " + role));
+    }
+
+    private SaveLocationResultEnum saveNewLocation(
+            @Nonnull String city,
+            @Nonnull String district,
+            @Nonnull String address,
+            @Nonnull Double latitude,
+            @Nonnull Double longitude)
+    {
         try
         {
             UUID locationGroupId = UUID.randomUUID();
 
-            locationGroupRepository.save(
-                    ModelMapper.map(locationGroupId,
-                            city,
-                            district));
-            locationRepository.save(ModelMapper.map(UUID.randomUUID(),
-                    locationGroupId,
-                    address,
-                    latitude,
-                    longitude));
+            locationGroupRepository.save(ModelMapper.map(locationGroupId, city, district));
+            locationRepository.save(
+                    ModelMapper.map(UUID.randomUUID(), locationGroupId, address, latitude,
+                            longitude));
+
             return SaveLocationResultEnum.SUCCESS;
 
         } catch (Exception e)
@@ -87,19 +101,31 @@ public class PowerbankSystemService
 
     @Auditable(action = READ, table = LOCATION)
     @Transactional(rollbackFor = Exception.class)
-    public Optional<List<Location>> getLocations()
+    public Optional<List<Location>> getLocations(@Nonnull String role)
     {
-        return Optional.of(queryService.getAllWithGroup())
-                .filter(not(List::isEmpty))
-                .map(list -> list.stream()
+        return Optional.of(role)
+                .filter(currentRole -> accessControlService.isAllowed(currentRole, GET_LOCATIONS))
+                .map(currentRole -> queryService.getAllWithGroup())
+                .map(locations -> locations.stream()
                         .map(ModelMapper::map)
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()))
+                .or(() -> {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                            "Access denied for role: " + role);
+                });
     }
 
     @Auditable(action = INSERT, table = POWERBANK)
     @Transactional(rollbackFor = Exception.class)
-    public Optional<UUID> savePowerbank(@Nonnull DeviceAggregate deviceAggregate)
+    public Optional<UUID> savePowerbank(@Nonnull String role,
+                                        @Nonnull DeviceAggregate deviceAggregate)
     {
+
+        Optional.of(role)
+                .filter(currentRole -> accessControlService.isAllowed(currentRole, SAVE_POWERBANK))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "Access denied for role: " + role));
+
         UUID powerbankId = UUID.randomUUID();
         UUID locationId = UUID.randomUUID();
         UUID locationGroupId = UUID.randomUUID();
@@ -172,11 +198,17 @@ public class PowerbankSystemService
     @Auditable(action = READ, table = POWERBANK)
     @Transactional(rollbackFor = Exception.class)
     public Optional<Powerbank> getPowerbank(
+            @Nonnull String role,
             @Nonnull UUID userId,
             @Nullable Integer requestedDurationMinutes,
             @Nonnull UUID powerbankId
     )
     {
+        Optional.of(role)
+                .filter(currentRole -> accessControlService.isAllowed(currentRole, GET_POWERBANK))
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.FORBIDDEN, "Access denied for role: " + role));
+
         try
         {
             return Optional.of(queryService.existsUserAndPowerbank(userId, powerbankId))

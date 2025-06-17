@@ -33,6 +33,8 @@ class PowerbankSystemServiceTest
     public static final String USER_ID = "2a30e8d4-5f3c-43c9-a01e-69e5d5f92223";
 
     public static final String POWERBANK_ID = "9a07e5a1-2b0c-40d6-e8c8-d6a2c2f9b900";
+    public static final String USER = "user";
+    public static final String ADMIN = "admin";
 
     @Autowired
     private PowerbankSystemService powerbankSystemService;
@@ -197,7 +199,8 @@ class PowerbankSystemServiceTest
                         .build())
                 .build();
 
-        Optional<UUID> savedIdOptional = powerbankSystemService.savePowerbank(deviceAggregate);
+        Optional<UUID> savedIdOptional = powerbankSystemService.savePowerbank(ADMIN,
+                deviceAggregate);
 
         assertTrue(savedIdOptional.isPresent(), "Saved powerbank ID should be present");
 
@@ -216,6 +219,7 @@ class PowerbankSystemServiceTest
     {
 
         com.powerfind.model.data.Powerbank powerbank = powerbankSystemService.getPowerbank(
+                USER,
                 UUID.fromString(USER_ID),
                 2,
                 UUID.fromString(POWERBANK_ID)

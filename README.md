@@ -91,13 +91,37 @@ In this project, I have implemented **Spring Cloud Gateway** as the central API 
 
 All external routes start with the prefix: `/api/v1`
 
-The gateway rewrites and forwards these requests to the backend under: `/public/`
+The gateway takes this request and **rewrites** it to a different path that goes to the backend.  
+For example:
 
-- `GET /api/v1/location` → backend `GET /public/location`
-- `POST /api/v1/powerbank` → backend `POST /public/powerbank`
+- `GET /api/v1/location` → becomes → `GET /public/location`
+- `POST /api/v1/powerbank` → becomes → `POST /public/powerbank`
 
-You can see the full route and filter configuration here:
-[**application.yml**](https://github.com/Harut20024/PowerGateway/blob/main/src/main/resources/application.yml)
+These rewritten paths are handled by the backend service.
+
+### Route Rules
+
+You can see all the routes and filters in the configuration file:  
+➡ [application.yml](https://github.com/Harut20024/PowerGateway/blob/main/src/main/resources/application.yml)
+
+### API Key and Role Logic
+
+The gateway also checks for an API key in each request.
+
+- It looks for the header: `X-API-KEY`
+- The key must exist in the database
+- If valid, it checks the user’s **role** (e.g. admin or user)
+
+Then it adds the user’s role to the request as a new header: `X-USER-ROLE`.  
+This helps the backend know what the user is allowed to do.
+
+### Role Example
+
+If the key is for an **admin**, the backend allows all actions.
+
+If the key is for a normal **user**, only limited actions like `getLocations` or `getPowerbank` are allowed.
+
+If the key is missing or not valid → the gateway returns `403 Forbidden`.
 
 ## Kafka
 

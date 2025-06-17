@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 
@@ -25,15 +24,17 @@ public class BackofficeController implements PublicApi
     private final PowerbankSystemService powerbankSystemService;
 
     @Override
-    public ResponseEntity<List<com.powerfind.backoffice.model.Location>> getLocation()
+    public ResponseEntity<List<com.powerfind.backoffice.model.Location>> getLocation(
+            @Nonnull String role)
     {
-        return Objects.requireNonNull(powerbankSystemService.getLocations())
+        return powerbankSystemService.getLocations(role)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.noContent().build());
+                .orElse(ResponseEntity.noContent().build());
     }
 
     @Override
     public ResponseEntity<EditResponse> postLocation(
+            @Nonnull String role,
             @Nonnull String city,
             @Nonnull String district,
             @Nonnull String address,
@@ -42,7 +43,7 @@ public class BackofficeController implements PublicApi
     {
 
 
-        return switch (powerbankSystemService.saveLocation(city, district,
+        return switch (powerbankSystemService.saveLocation(role, city, district,
                 address, latitude, longitude))
         {
             case SUCCESS -> ResponseEntity.status(HttpStatus.CREATED)
@@ -59,12 +60,14 @@ public class BackofficeController implements PublicApi
 
     @Override
     public ResponseEntity<EditResponse> getPowerbank(
+            @Nonnull String role,
             @Nonnull UUID userId,
             @Nonnull UUID powerbankId,
             @Nullable Integer requestedDurationMinutes
     )
     {
-        return powerbankSystemService.getPowerbank(userId, requestedDurationMinutes, powerbankId)
+        return powerbankSystemService.getPowerbank(role, userId, requestedDurationMinutes,
+                        powerbankId)
                 .map(powerbank -> ResponseEntity.ok(
                         new EditResponse().message("Powerbank retrieved successfully")))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -73,10 +76,11 @@ public class BackofficeController implements PublicApi
 
     @Override
     public ResponseEntity<EditResponse> postPowerbank(
+            @Nonnull String role,
             @Nonnull NewPowerbankRequest newPowerbankRequest)
     {
         return powerbankSystemService.savePowerbank(
-                        ModelMapper.map(newPowerbankRequest))
+                        role, ModelMapper.map(newPowerbankRequest))
                 .map(exist -> ResponseEntity.ok(
                         new EditResponse().message("Powerbank added successfully")))
                 .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)

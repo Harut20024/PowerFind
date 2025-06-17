@@ -9,6 +9,12 @@ paths:
     get:
       summary: Get available locations for powerbanks
       operationId: getLocation
+      parameters:
+        - name: X-USER-ROLE
+          in: header
+          required: true
+          schema:
+            type: string
       responses:
         200:
           description: Get locations
@@ -20,6 +26,11 @@ paths:
       summary: Add new location for powerbank
       operationId: postLocation
       parameters:
+        - name: X-USER-ROLE
+          in: header
+          required: true
+          schema:
+            type: string
         - name: city
           in: query
           required: true
@@ -62,6 +73,11 @@ paths:
       summary: Get available powerbank for user
       operationId: getPowerbank
       parameters:
+        - name: X-USER-ROLE
+          in: header
+          required: true
+          schema:
+            type: string
         - name: userId
           in: query
           required: true
@@ -92,6 +108,12 @@ paths:
     post:
       summary: Add new powerbank
       operationId: postPowerbank
+      parameters:
+        - name: X-USER-ROLE
+          in: header
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:

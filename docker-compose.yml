@@ -1,7 +1,7 @@
 services:
   postgres:
-    image: postgres:14
-    container_name: power-postgres
+    image: postgres:15
+    container_name: power-app
     ports:
       - "5432:5432"
     environment:
